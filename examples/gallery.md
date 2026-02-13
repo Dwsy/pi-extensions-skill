@@ -148,6 +148,23 @@ pi.on("tool_call", async (event, ctx) => {
 });
 ```
 
+### Recipe: Timed Confirmation Guard (RPC-safe)
+
+```typescript
+pi.on("tool_call", async (event, ctx) => {
+  if (event.toolName === "bash" && isDangerous(event.input.command)) {
+    if (!ctx.hasUI) return { block: true, reason: "No UI" };
+    // select() works in both TUI and RPC (unlike custom())
+    const choice = await ctx.ui.select(
+      `⚠️ ${event.input.command}`,
+      ["Allow", "Block"],
+      { timeout: 30000 }
+    );
+    return choice === "Allow" ? undefined : { block: true, reason: "Blocked" };
+  }
+});
+```
+
 ### Recipe: Progress Widget
 
 ```typescript
@@ -171,6 +188,50 @@ function loadState(entries: SessionEntry[]): State {
   }
   return defaultState;
 }
+```
+
+### Recipe: RPC Mode Guard
+
+```typescript
+export default function (pi: ExtensionAPI) {
+  // Skip entirely in RPC mode (for TUI-only extensions)
+  if (process.argv.includes("--mode") && process.argv.includes("rpc")) return;
+  // ... extension code
+}
+```
+
+### Recipe: Custom Message Renderer
+
+```typescript
+pi.registerMessageRenderer("my-type", (message, { expanded }, theme) => {
+  let text = theme.fg("accent", `[${message.customType}] `) + message.content;
+  if (expanded && message.details) {
+    text += "\n" + theme.fg("dim", JSON.stringify(message.details, null, 2));
+  }
+  return new Text(text, 0, 0);
+});
+```
+
+### Recipe: Inter-Extension Communication
+
+```typescript
+// Emit
+pi.events.emit("my:data-ready", { path: "/tmp/result.json" });
+
+// Listen
+pi.events.on("my:data-ready", (data) => {
+  const { path } = data as { path: string };
+  // process...
+});
+```
+
+### Recipe: Dynamic Resource Loading
+
+```typescript
+pi.on("resources_discover", () => ({
+  skillPaths: [join(__dirname, "SKILL.md")],
+  promptPaths: [join(__dirname, "prompts/")],
+}));
 ```
 
 ---

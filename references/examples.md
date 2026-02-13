@@ -342,3 +342,179 @@ if (model) {
   }
 }
 ```
+
+## New API Examples
+
+### Inter-Extension Event Bus
+
+```typescript
+// Extension A: emit events
+pi.events.emit("my:notification", { message: "hello", from: "ext-a" });
+
+// Extension B: listen for events
+pi.events.on("my:notification", (data) => {
+  const { message, from } = data as { message: string; from: string };
+  currentCtx?.ui.notify(`From ${from}: ${message}`, "info");
+});
+```
+
+### Session Metadata
+
+```typescript
+// Name sessions for the selector
+pi.setSessionName("Refactor auth module");
+const name = pi.getSessionName();
+
+// Bookmark entries for /tree navigation
+pi.setLabel(entryId, "checkpoint-before-refactor");
+pi.setLabel(entryId, undefined); // clear
+const label = ctx.sessionManager.getLabel(entryId);
+```
+
+### Custom Message Rendering
+
+```typescript
+// Register renderer for your custom message type
+pi.registerMessageRenderer("status-update", (message, { expanded }, theme) => {
+  const level = (message.details as any)?.level ?? "info";
+  const color = level === "error" ? "error" : "success";
+  let text = `${theme.fg(color, `[${level}]`)} ${message.content}`;
+  if (expanded && (message.details as any)?.timestamp) {
+    text += `\n${theme.fg("dim", `  at ${new Date((message.details as any).timestamp).toLocaleTimeString()}`)}`;
+  }
+  const box = new Box(1, 1, (t) => theme.bg("customMessageBg", t));
+  box.addChild(new Text(text, 0, 0));
+  return box;
+});
+
+// Send custom messages
+pi.sendMessage({
+  customType: "status-update",
+  content: "Deploy complete",
+  display: true,
+  details: { level: "info", timestamp: Date.now() },
+});
+```
+
+### Dynamic Resource Discovery
+
+```typescript
+pi.on("resources_discover", () => ({
+  skillPaths: [join(baseDir, "SKILL.md")],
+  promptPaths: [join(baseDir, "dynamic.md")],
+  themePaths: [join(baseDir, "dynamic.json")],
+}));
+```
+
+### Custom Provider Registration
+
+```typescript
+// Register a proxy provider
+pi.registerProvider("my-proxy", {
+  baseUrl: "https://proxy.example.com",
+  apiKey: "PROXY_API_KEY",
+  api: "anthropic-messages",
+  models: [{
+    id: "claude-sonnet-4-20250514",
+    name: "Claude 4 Sonnet (proxy)",
+    reasoning: false,
+    input: ["text", "image"],
+    cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+    contextWindow: 200000,
+    maxTokens: 16384,
+  }],
+});
+
+// Override baseUrl for existing provider
+pi.registerProvider("anthropic", {
+  baseUrl: "https://proxy.example.com",
+});
+```
+
+### Bash Spawn Hook
+
+```typescript
+import { createBashTool } from "@mariozechner/pi-coding-agent";
+
+const bashTool = createBashTool(cwd, {
+  spawnHook: ({ command, cwd, env }) => ({
+    command: `source ~/.profile\n${command}`,
+    cwd,
+    env: { ...env, MY_VAR: "1" },
+  }),
+});
+
+pi.registerTool({
+  ...bashTool,
+  execute: async (id, params, signal, onUpdate) => {
+    return bashTool.execute(id, params, signal, onUpdate);
+  },
+});
+```
+
+### Timed Dialogs
+
+```typescript
+// Auto-cancel after 5 seconds with countdown display
+const confirmed = await ctx.ui.confirm(
+  "Allow?",
+  "Auto-blocks in 5 seconds",
+  { timeout: 5000 }
+);
+
+// Manual control with AbortSignal
+const controller = new AbortController();
+setTimeout(() => controller.abort(), 5000);
+const choice = await ctx.ui.select("Pick:", ["A", "B"], { signal: controller.signal });
+```
+
+### Runtime Reload
+
+```typescript
+// Command that reloads extensions/skills/prompts/themes
+pi.registerCommand("reload", {
+  handler: async (_args, ctx) => {
+    await ctx.reload();
+  },
+});
+
+// LLM tool that queues reload as follow-up
+pi.registerTool({
+  name: "reload_runtime",
+  async execute() {
+    pi.sendUserMessage("/reload", { deliverAs: "followUp" });
+    return { content: [{ type: "text", text: "Queued reload" }] };
+  },
+});
+```
+
+### Preset System
+
+```typescript
+pi.registerFlag("preset", {
+  description: "Start with a named preset",
+  type: "string",
+});
+
+pi.registerCommand("preset", {
+  handler: async (args, ctx) => {
+    const presets = loadPresets(ctx.cwd);
+    const name = args.trim() || await ctx.ui.select("Preset:", Object.keys(presets));
+    if (!name || !presets[name]) return;
+
+    const p = presets[name];
+    if (p.provider && p.model) {
+      const model = ctx.modelRegistry.find(p.provider, p.model);
+      if (model) await pi.setModel(model);
+    }
+    if (p.thinkingLevel) pi.setThinkingLevel(p.thinkingLevel);
+    if (p.tools) pi.setActiveTools(p.tools);
+  },
+});
+
+// Cycle presets with shortcut
+pi.registerShortcut("ctrl+shift+u", {
+  description: "Cycle presets",
+  handler: async (ctx) => { /* ... */ },
+});
+```

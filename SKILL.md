@@ -15,6 +15,7 @@ description: Progressive learning guide for Pi extension development. Start with
 | 🌿 Intermediate | [Core Paradigms](guides/02-paradigms.md) | Tools, Commands, Events, UI |
 | 🌳 Advanced | [State Management](guides/03-state.md) | Persistent and cross-session state |
 | 🏔️ Expert | [Production Patterns](guides/04-production.md) | Multi-mode, workflows, memory systems |
+| 🔌 RPC | [RPC Mode](guides/05-rpc-mode.md) | Multi-mode compatibility, degradation |
 | 📚 Reference | [API Reference](references/api.md) | Complete API documentation |
 | 🧩 Examples | [Real Extensions](examples/gallery.md) | Annotated production code |
 
@@ -38,6 +39,8 @@ Your Goal
 ├─► Multi-mode session handling ───► [Production: Multi-Mode](guides/04-production.md#multi-mode)
 ├─► Workflow orchestration ────────► [Production: Workflows](guides/04-production.md#workflows)
 ├─► Memory/learning systems ───────► [Production: Memory](guides/04-production.md#memory)
+│
+├─► RPC mode compatibility ────────► [RPC Mode](guides/05-rpc-mode.md)
 │
 └─► Study real examples ───────────► [Example Gallery](examples/gallery.md)
 ```
@@ -152,15 +155,16 @@ pi.appendEntry("my-state", { count: 42 });
 │   ├── 01-quickstart.md        # First extension
 │   ├── 02-paradigms.md         # Core patterns
 │   ├── 03-state.md             # State management
-│   └── 04-production.md        # Advanced architectures
+│   ├── 04-production.md        # Advanced architectures
+│   └── 05-rpc-mode.md          # RPC mode compatibility
 ├── references/
 │   ├── api.md                  # Complete API
+│   ├── api-quickref.md         # Quick reference card
 │   ├── events.md               # Event reference
-│   └── troubleshooting.md      # Common issues
+│   ├── examples.md             # Code examples
+│   └── ui-components.md        # TUI components
 └── examples/
-    ├── gallery.md              # Extension showcase
-    ├── templates/              # Starter templates
-    └── recipes/                # Copy-paste solutions
+    └── gallery.md              # Extension showcase
 ```
 
 ---

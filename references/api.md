@@ -99,6 +99,61 @@ pi.getThinkingLevel(): ThinkingLevel
 pi.setThinkingLevel(level: ThinkingLevel): void
 ```
 
+### Session Metadata
+
+```typescript
+pi.setSessionName(name: string): void
+pi.getSessionName(): string | undefined
+pi.setLabel(entryId: string, label: string | undefined): void
+```
+
+### Command Discovery
+
+```typescript
+pi.getCommands(): Array<{
+  name: string;
+  description?: string;
+  source: "extension" | "prompt" | "skill";
+  location?: "user" | "project" | "path";
+  path?: string;
+}>
+```
+
+### Provider Registration
+
+```typescript
+pi.registerProvider(name: string, config: {
+  baseUrl?: string;
+  apiKey?: string;
+  api?: string;
+  headers?: Record<string, string>;
+  authHeader?: boolean;
+  models?: ModelDefinition[];
+  oauth?: OAuthConfig;
+  streamSimple?: StreamSimpleConfig;
+}): void
+```
+
+### Message Rendering
+
+```typescript
+pi.registerMessageRenderer(customType: string, renderer: (
+  message: CustomMessage,
+  options: { expanded: boolean },
+  theme: Theme
+) => Component): void
+```
+
+### Dynamic Resources
+
+```typescript
+pi.on("resources_discover", () => ({
+  skillPaths?: string[];
+  promptPaths?: string[];
+  themePaths?: string[];
+}))
+```
+
 ### Execution
 
 ```typescript
@@ -133,6 +188,18 @@ ctx.abort(): void
 ctx.hasPendingMessages(): boolean
 ctx.shutdown(): void
 ctx.getContextUsage(): ContextUsage
+ctx.compact(options?): Promise<void>
+ctx.getSystemPrompt(): string
+```
+
+### ExtensionCommandContext (extends ExtensionContext)
+
+```typescript
+ctx.waitForIdle(): Promise<void>
+ctx.newSession(options?): Promise<void>
+ctx.fork(entryId: string): Promise<void>
+ctx.navigateTree(targetId: string, options?): Promise<void>
+ctx.reload(): Promise<void>
 ```
 
 ## UI Context
@@ -140,11 +207,11 @@ ctx.getContextUsage(): ContextUsage
 ### Dialogs
 
 ```typescript
-ctx.ui.select(title: string, options: string[]): Promise<string | undefined>
-ctx.ui.confirm(title: string, message: string, opts?: { timeout?: number }): Promise<boolean>
+ctx.ui.select(title: string, options: string[], opts?: { timeout?: number; signal?: AbortSignal }): Promise<string | undefined>
+ctx.ui.confirm(title: string, message: string, opts?: { timeout?: number; signal?: AbortSignal }): Promise<boolean>
 ctx.ui.input(title: string, placeholder?: string): Promise<string | undefined>
 ctx.ui.editor(title: string, prefill?: string): Promise<string | undefined>
-ctx.ui.custom<T>(factory, options?: { overlay?: boolean }): Promise<T>
+ctx.ui.custom<T>(factory, options?: { overlay?: boolean; overlayOptions?: OverlayOptions; onHandle?: (handle) => void }): Promise<T>
 ```
 
 ### Status
@@ -161,4 +228,29 @@ ctx.ui.setWidget(key: string, content?: string[] | ComponentFactory): void
 ```typescript
 ctx.ui.setEditorText(text: string): void
 ctx.ui.getEditorText(): string
+ctx.ui.pasteToEditor(text: string): void
+ctx.ui.setEditorComponent(factory?: EditorFactory): void
+ctx.ui.getToolsExpanded(): boolean
+ctx.ui.setToolsExpanded(expanded: boolean): void
+ctx.ui.setTitle(title: string): void
+ctx.ui.setFooter(renderer?: FooterFactory): void
+ctx.ui.getAllThemes(): ThemeInfo[]
+ctx.ui.getTheme(name: string): Theme | undefined
+ctx.ui.setTheme(nameOrTheme: string | Theme): { success: boolean; error?: string }
+ctx.ui.theme: Theme  // Current theme
 ```
+
+## RPC Mode Behavior
+
+In RPC mode (`--mode rpc`), `ctx.hasUI` is `true` but some methods are degraded:
+
+| Method | RPC Behavior |
+|--------|-------------|
+| `select/confirm/input/editor` | ✅ Works via JSON protocol |
+| `notify/setStatus/setWidget/setTitle/setEditorText` | ✅ Fire-and-forget events |
+| `custom()` | ❌ Returns `undefined` |
+| `setWorkingMessage/setFooter/setHeader/setEditorComponent` | ❌ No-op |
+| `getEditorText()` | Returns `""` |
+| `getAllThemes()` | Returns `[]` |
+
+See [RPC Mode Guide](../guides/05-rpc-mode.md) for compatibility patterns.
