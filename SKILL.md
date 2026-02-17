@@ -146,6 +146,84 @@ pi.on("tool_call", async (event) => {
 pi.appendEntry("my-state", { count: 42 });
 ```
 
+## Hot Topic: Dynamic Model Injection (Provider Plugin)
+
+> **Simplicity is prerequisite for reliability.** — Edsger W. Dijkstra
+
+Use `pi.registerProvider()` when you need runtime model/provider injection.
+
+```typescript
+import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+
+export default function (pi: ExtensionAPI) {
+  pi.registerProvider("my-proxy", {
+    baseUrl: "https://proxy.example.com/v1",
+    apiKey: "MY_PROXY_API_KEY",
+    api: "openai-responses",
+    authHeader: true,
+    models: [
+      {
+        id: "claude-sonnet-4-5",
+        name: "Claude Sonnet 4.5 (Proxy)",
+        reasoning: true,
+        input: ["text", "image"],
+        cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+        contextWindow: 200000,
+        maxTokens: 16384,
+      },
+    ],
+  });
+}
+```
+
+Runtime lifecycle (important):
+1. Extension calls `pi.registerProvider(...)` during load.
+2. Loader queues registrations in `pendingProviderRegistrations`.
+3. Runner binds core and flushes queue into `modelRegistry.registerProvider(...)`.
+4. Registry applies replacement or override logic and keeps registrations for refresh.
+
+Rules of thumb:
+- `models` provided => requires `baseUrl` + (`apiKey` or `oauth`).
+- only `baseUrl/headers` => override existing provider models.
+- custom stream via `streamSimple` => requires `api`.
+
+### Qwen Provider (key source aligned with `~/.pi/agent/extensions/web-fetch/`)
+
+`web-fetch/providers.ts` uses this priority:
+1. `~/.qwen/oauth_creds.json` (`access_token`, not expired)
+2. `~/.cli-proxy-api/qwen-*.json` (`access_token` / `api_key`, newest first)
+
+You can mirror that in provider injection using shell-resolved `apiKey` (`!` prefix):
+
+```typescript
+pi.registerProvider("qwen", {
+  baseUrl: "https://portal.qwen.ai/v1",
+  api: "openai-responses",
+  authHeader: true,
+  apiKey: "!python3 -c \"import json,glob,os,time; p=os.path.expanduser('~/.qwen/oauth_creds.json');\nif os.path.exists(p):\n d=json.load(open(p));\n t=d.get('access_token'); e=d.get('expiry_date',0);\n if t and e>int(time.time()*1000): print(t); raise SystemExit\nfs=sorted(glob.glob(os.path.expanduser('~/.cli-proxy-api/qwen-*.json')), key=lambda f: os.path.getmtime(f), reverse=True)\nfor f in fs:\n d=json.load(open(f)); t=d.get('access_token') or d.get('api_key');\n if t and not d.get('disabled'): print(t); break\"",
+  models: [
+    {
+      id: "qwen-max",
+      name: "Qwen Max",
+      reasoning: true,
+      input: ["text", "image"],
+      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
+      contextWindow: 131072,
+      maxTokens: 8192,
+    },
+  ],
+  headers: {
+    "X-DashScope-AuthType": "qwen-oauth",
+    "X-DashScope-CacheControl": "enable",
+    "X-DashScope-UserAgent": "QwenCode/0.10.3 (darwin; arm64)",
+  },
+});
+```
+
+Security note:
+- Never hardcode bearer token literals in extension files.
+- If a token was exposed in logs/chat, rotate it immediately.
+
 ---
 
 ## Directory Structure
