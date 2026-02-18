@@ -1,6 +1,8 @@
 ---
 name: pi-extensions
-description: Progressive learning guide for Pi extension development. Start with quickstart, then explore paradigms, advanced patterns, and production architectures.
+description: |
+  Pi extension development guide + package browser. 
+  Use when: building extensions, searching pi packages/skills/themes, or learning extension patterns.
 ---
 
 # Pi Extensions - Progressive Learning Path
@@ -166,6 +168,30 @@ pi.appendEntry("my-state", { count: 42 });
 └── examples/
     └── gallery.md              # Extension showcase
 ```
+
+---
+
+## 🔧 Tools
+
+### Search Pi Packages
+
+Search and browse packages from the pi.dev registry:
+
+```bash
+# Search by keyword
+bun ~/.pi/agent/skills/pi-extensions/scripts/search-packages.ts "mcp"
+bun ~/.pi/agent/skills/pi-extensions/scripts/search-packages.ts "theme"
+bun ~/.pi/agent/skills/pi-extensions/scripts/search-packages.ts "skill"
+
+# List top packages by downloads
+bun ~/.pi/agent/skills/pi-extensions/scripts/search-packages.ts
+```
+
+Features:
+- Fetches from npm registry API (`keywords:pi-package`)
+- Auto-categorizes: extension, skill, theme, prompt
+- Sorted by monthly downloads
+- Local file cache (15min TTL)
 
 ---
 
