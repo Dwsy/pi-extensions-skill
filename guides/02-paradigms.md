@@ -21,9 +21,12 @@ pi.registerTool({
     url: Type.String(),
     method: Type.String({ enum: ["GET", "POST"] }),
   }),
-  async execute(toolCallId, params, signal, onUpdate, ctx) {
+  async execute(toolCallId, params, signal, onPartialResult) {
     // Report progress
-    onUpdate?.({ content: [{ type: "text", text: "Fetching..." }] });
+    onPartialResult?.({
+      content: [{ type: "text", text: "Fetching..." }],
+      details: { progress: 0 }
+    });
     
     const data = await fetch(params.url, { signal });
     
@@ -43,9 +46,69 @@ pi.registerTool({
 
 **Key Concepts:**
 - `parameters`: TypeBox schema for validation
-- `onUpdate`: Stream progress to LLM
+- `onPartialResult`: Stream progress to LLM (optional 4th parameter)
+- `signal`: AbortSignal for cancellation support
 - `details`: Store structured data for recovery
 - Custom renderers for better UX
+
+### Streaming Tools
+
+Tools can emit partial results during execution for long-running operations:
+
+```typescript
+pi.registerTool({
+  name: "stream_text",
+  label: "Stream Text",
+  parameters: Type.Object({
+    text: Type.String(),
+    chunkSize: Type.Number({ default: 80 }),
+  }),
+  async execute(_toolCallId, params, signal, onPartialResult) {
+    const { text, chunkSize } = params;
+    const chunks = [];
+    
+    // Split into chunks
+    for (let i = 0; i < text.length; i += chunkSize) {
+      chunks.push(text.slice(i, i + chunkSize));
+    }
+    
+    let accumulated = "";
+    for (let i = 0; i < chunks.length; i++) {
+      // Check for cancellation
+      if (signal?.aborted) {
+        return { content: [{ type: "text", text: "Aborted" }] };
+      }
+      
+      accumulated += chunks[i];
+      
+      // Emit partial result
+      if (onPartialResult) {
+        onPartialResult({
+          content: [{
+            type: "text",
+            text: accumulated + (i < chunks.length - 1 ? "…" : "")
+          }],
+          details: { progress: i + 1, total: chunks.length },
+        });
+      }
+      
+      // Simulate work
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    
+    return {
+      content: [{ type: "text", text: accumulated }],
+      details: { completed: true, chunks: chunks.length },
+    };
+  },
+});
+```
+
+**Streaming Best Practices:**
+- Always check `signal.aborted` to support cancellation
+- Use `…` or similar indicator to show more content is coming
+- Include progress metadata in `details`
+- Don't wait until completion to call `onPartialResult`
 
 ---
 

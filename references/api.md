@@ -22,7 +22,12 @@ interface ToolDefinition<TParams, TDetails> {
   label: string;
   description: string;
   parameters: TSchema;
-  execute: (toolCallId, params, signal, onUpdate, ctx) => Promise<AgentToolResult<TDetails>>;
+  execute: (
+    toolCallId: string,
+    params: TParams,
+    signal: AbortSignal,
+    onPartialResult?: (result: AgentToolResult) => void
+  ) => Promise<AgentToolResult<TDetails>>;
   renderCall?: (args, theme) => Component;
   renderResult?: (result, options, theme) => Component;
 }
