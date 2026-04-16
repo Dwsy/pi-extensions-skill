@@ -1,0 +1,11 @@
+{
+  "name": "pi-skill-registry",
+  "type": "module",
+  "scripts": {
+    "search": "bun run scripts/pi-skill-registry.ts search",
+    "eval": "bun run scripts/pi-skill-registry.ts eval",
+    "install": "bun run scripts/pi-skill-registry.ts install",
+    "discover": "bun run scripts/pi-skill-registry.ts discover",
+    "list": "bun run scripts/pi-skill-registry.ts list-installed"
+  }
+}
