@@ -1,67 +1,141 @@
 ---
 name: pi-extensions
 description: |
-  Pi extension development guide + package browser. 
-  Use when: building extensions, searching pi packages/skills/themes, or learning extension patterns.
+  Pi extension development master reference.
+  Use when: building pi extensions, debugging extension behavior, or choosing the right pattern.
 ---
 
-# Pi Extensions - Progressive Learning Path
+# Pi Extensions — LLM Master Reference
 
-> **The journey of a thousand miles begins with a single step.** — Laozi
+## Start Here (Read Order)
 
-## Quick Navigation
+| Priority | Document | Read When |
+|----------|----------|-----------|
+| **1** | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Before writing ANY extension code |
+| **2** | [`PATTERNS.md`](PATTERNS.md) | When you need copy-paste code for a specific task |
+| **3** | [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) | When reviewing or debugging extension code |
 
-| Level | Document | Purpose |
-|-------|----------|---------|
-| 🌱 Beginner | [Quickstart](guides/01-quickstart.md) | First extension in 5 minutes |
-| 🌿 Intermediate | [Core Paradigms](guides/02-paradigms.md) | Tools, Commands, Events, UI |
-| 🌳 Advanced | [State Management](guides/03-state.md) | Persistent and cross-session state |
-| 🏔️ Expert | [Production Patterns](guides/04-production.md) | Multi-mode, workflows, memory systems |
-| 🔌 RPC | [RPC Mode](guides/05-rpc-mode.md) | Multi-mode compatibility, degradation |
-| 📚 Reference | [API Reference](references/api.md) | Complete API documentation |
-| 🧩 Examples | [Real Extensions](examples/gallery.md) | Annotated production code |
+The `guides/` and `references/` directories contain deeper narratives and examples. Use them after scanning the three master docs above.
 
-## Decision Tree - Where to Start?
+---
+
+## One-Line Directives
+
+- **Writing a new extension?** → Read [`ARCHITECTURE.md`](ARCHITECTURE.md) §1–§5, then copy the matching pattern from [`PATTERNS.md`](PATTERNS.md).
+- **Extension is broken?** → Check [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) first.
+- **Need TUI component?** → [`PATTERNS.md`](PATTERNS.md) §P12–§P14, then [`guides/02-paradigms.md`](guides/02-paradigms.md) for narrative.
+- **Need custom provider/OAuth?** → [`PATTERNS.md`](PATTERNS.md) §P19–§P20, then [`guides/07-advanced-patterns.md`](guides/07-advanced-patterns.md).
+- **Need event semantics?** → [`ARCHITECTURE.md`](ARCHITECTURE.md) §5, then [`references/events.md`](references/events.md).
+- **Need RPC safety?** → [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) §A2, then [`guides/05-rpc-mode.md`](guides/05-rpc-mode.md).
+
+---
+
+## Master Decision Trees
+
+### Which document do I need?
 
 ```
-Your Goal
-│
-├─► First extension ───────────────► [Quickstart](guides/01-quickstart.md)
-│
-├─► Add LLM capability ────────────► [Tools](guides/02-paradigms.md#tools)
-│
-├─► Add slash command ─────────────► [Commands](guides/02-paradigms.md#commands)
-│
-├─► Intercept/modify behavior ─────► [Event Handlers](guides/02-paradigms.md#events)
-│
-├─► Build interactive UI ──────────► [Custom UI](guides/02-paradigms.md#ui)
-│
-├─► Manage complex state ──────────► [State Management](guides/03-state.md)
-│
-├─► Multi-mode session handling ───► [Production: Multi-Mode](guides/04-production.md#multi-mode)
-├─► Workflow orchestration ────────► [Production: Workflows](guides/04-production.md#workflows)
-├─► Memory/learning systems ───────► [Production: Memory](guides/04-production.md#memory)
-│
-├─► RPC mode compatibility ────────► [RPC Mode](guides/05-rpc-mode.md)
-│
-└─► Study real examples ───────────► [Example Gallery](examples/gallery.md)
+I need to understand how extensions work
+  └─► ARCHITECTURE.md
+
+I need working code to copy
+  └─► PATTERNS.md
+
+I need to know what NOT to do
+  └─► ANTI-PATTERNS.md
+
+I need a step-by-step first tutorial
+  └─► guides/01-quickstart.md
+
+I need deep narrative on tools/events/UI
+  └─► guides/02-paradigms.md
+
+I need state persistence strategies
+  └─► guides/03-state.md
+
+I need production architecture (workflows, memory)
+  └─► guides/04-production.md
+
+I need RPC mode specifics
+  └─► guides/05-rpc-mode.md
+
+I need pi internals (loader, runner, binding)
+  └─► guides/06-internals.md
+
+I need provider plugins, OAuth, overrides
+  └─► guides/07-advanced-patterns.md
 ```
 
-## Prerequisites
+### Which paradigm should I use?
 
-```bash
-# Ensure pi CLI is installed
-pi --version
-
-# Create extensions directory
-mkdir -p ~/.pi/agent/extensions
 ```
+Need LLM to perform action? ───────────────► Tool (PATTERNS P2–P5)
+Need user to type /command? ───────────────► Command (PATTERNS P6–P7)
+Need keyboard shortcut? ───────────────────► Shortcut (guides/02-paradigms.md)
+Need to react to system events? ───────────► Event handler (PATTERNS P8–P11)
+Need interactive TUI? ─────────────────────► Custom UI (PATTERNS P12–P14)
+Need to inject a model provider? ──────────► registerProvider (PATTERNS P19–P20)
+Need to override a built-in tool? ─────────► Tool override (PATTERNS P4)
+```
+
+### Which state persistence mechanism?
+
+```
+State should go to LLM context? ───────────► sendMessage({ customType, ... })
+State is extension-private? ───────────────► appendEntry("customType", data)
+State is user preference (cross-project)? ─► File in ~/.pi/agent/
+State is project-local? ───────────────────► File in .pi/
+State is temporary cache? ─────────────────► Local variable (reconstructed on reload)
+```
+
+---
+
+## Document Map
+
+### Master References (Read First)
+
+| File | Purpose | Length |
+|------|---------|--------|
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Mental model, execution flow, exact event semantics | ~9KB |
+| [`PATTERNS.md`](PATTERNS.md) | 24 copy-paste patterns with exact imports | ~14KB |
+| [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) | 15 common mistakes with corrections | ~9KB |
+
+### Progressive Guides (Read as Needed)
+
+| File | Level | Topic |
+|------|-------|-------|
+| [`guides/01-quickstart.md`](guides/01-quickstart.md) | 🌱 Beginner | First extension in 5 minutes |
+| [`guides/02-paradigms.md`](guides/02-paradigms.md) | 🌿 Intermediate | Tools, commands, events, UI deep dive |
+| [`guides/03-state.md`](guides/03-state.md) | 🌳 Advanced | Persistent and branch-resilient state |
+| [`guides/04-production.md`](guides/04-production.md) | 🏔️ Expert | Multi-mode, workflows, memory systems |
+| [`guides/05-rpc-mode.md`](guides/05-rpc-mode.md) | 🔌 RPC | RPC mode compatibility and degradation |
+| [`guides/06-internals.md`](guides/06-internals.md) | ⚙️ Internals | Loader, runner, event dispatch, binding |
+| [`guides/07-advanced-patterns.md`](guides/07-advanced-patterns.md) | 🚀 Advanced | Provider plugins, OAuth, tool overrides, file mutation queues |
+
+### Reference Docs
+
+| File | Purpose |
+|------|---------|
+| [`references/api.md`](references/api.md) | Complete API documentation |
+| [`references/api-quickref.md`](references/api-quickref.md) | Quick reference card |
+| [`references/events.md`](references/events.md) | Full event reference |
+| [`references/examples.md`](references/examples.md) | Additional code examples |
+| [`references/ui-components.md`](references/ui-components.md) | TUI component catalog |
+| [`references/source-patterns.md`](references/source-patterns.md) | Patterns extracted from pi source |
+
+### Examples
+
+| File | Purpose |
+|------|---------|
+| [`examples/gallery.md`](examples/gallery.md) | Annotated real-world extensions |
+
+---
 
 ## 5-Minute Quick Test
 
-Create `~/.pi/agent/extensions/hello.ts`:
-
-```typescript
+```bash
+mkdir -p ~/.pi/agent/extensions
+cat > ~/.pi/agent/extensions/hello.ts << 'EOF'
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
@@ -72,205 +146,48 @@ export default function (pi: ExtensionAPI) {
     },
   });
 }
-```
+EOF
 
-Run it:
-```bash
 pi -e ~/.pi/agent/extensions/hello.ts
 # Then type: /hello
 ```
 
-**Next:** Continue to [Quickstart](guides/01-quickstart.md) for a complete walkthrough.
-
 ---
 
-## Extension Type Decision Matrix
-
-| If you want to... | Use | See |
-|-------------------|-----|-----|
-| Let LLM call custom function | **Tool** | [Paradigms § Tools](guides/02-paradigms.md#tools) |
-| Add `/command` for user | **Command** | [Paradigms § Commands](guides/02-paradigms.md#commands) |
-| React to system events | **Event Handler** | [Paradigms § Events](guides/02-paradigms.md#events) |
-| Build custom TUI | **Custom UI** | [Paradigms § UI](guides/02-paradigms.md#ui) |
-
-## Learning Path Recommendations
-
-### Path A: Tool Builder
-1. [Quickstart](guides/01-quickstart.md) - Understand basics
-2. [Tools](guides/02-paradigms.md#tools) - Deep dive into tool pattern
-3. [State Management](guides/03-state.md) - Persist tool results
-4. [Examples: Tools](examples/gallery.md#tools) - Study real implementations
-
-### Path B: UI Developer
-1. [Quickstart](guides/01-quickstart.md) - Basic setup
-2. [Custom UI](guides/02-paradigms.md#ui) - Component architecture
-3. [Production: TUI Patterns](guides/04-production.md#tui-patterns) - Advanced techniques
-4. [Examples: UI](examples/gallery.md#ui) - Real TUI extensions
-
-### Path C: Systems Engineer
-1. [Quickstart](guides/01-quickstart.md) - Foundation
-2. [Event Handlers](guides/02-paradigms.md#events) - Interception patterns
-3. [State Management](guides/03-state.md) - Complex state machines
-4. [Production Patterns](guides/04-production.md) - Enterprise architecture
-
-## Common Patterns Quick Reference
+## Quick Import Cheat Sheet
 
 ```typescript
-// Pattern: Tool with progress
-pi.registerTool({
-  name: "process",
-  async execute(_id, params, signal, onUpdate, ctx) {
-    onUpdate({ content: [{ type: "text", text: "Starting..." }] });
-    // ... do work
-    return { content: [{ type: "text", text: "Done" }] };
-  },
-});
+// Core types
+import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
 
-// Pattern: Command with confirmation
-pi.registerCommand("dangerous", {
-  handler: async (_args, ctx) => {
-    const ok = await ctx.ui.confirm("Sure?", "This cannot be undone");
-    if (!ok) return;
-    // ... proceed
-  },
-});
+// Schema
+import { Type } from "@sinclair/typebox";
+import { StringEnum } from "@mariozechner/pi-ai";
 
-// Pattern: Event interception
-pi.on("tool_call", async (event) => {
-  if (event.toolName === "bash" && event.input.command.includes("rm")) {
-    return { block: true, reason: "Use trash instead" };
-  }
-});
+// TUI
+import { Container, Text, SelectList } from "@mariozechner/pi-tui";
 
-// Pattern: Persistent state
-pi.appendEntry("my-state", { count: 42 });
-```
-
-## Hot Topic: Dynamic Model Injection (Provider Plugin)
-
-> **Simplicity is prerequisite for reliability.** — Edsger W. Dijkstra
-
-Use `pi.registerProvider()` when you need runtime model/provider injection.
-
-```typescript
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-
-export default function (pi: ExtensionAPI) {
-  pi.registerProvider("my-proxy", {
-    baseUrl: "https://proxy.example.com/v1",
-    apiKey: "MY_PROXY_API_KEY",
-    api: "openai-responses",
-    authHeader: true,
-    models: [
-      {
-        id: "claude-sonnet-4-5",
-        name: "Claude Sonnet 4.5 (Proxy)",
-        reasoning: true,
-        input: ["text", "image"],
-        cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-        contextWindow: 200000,
-        maxTokens: 16384,
-      },
-    ],
-  });
-}
-```
-
-Runtime lifecycle (important):
-1. Extension calls `pi.registerProvider(...)` during load.
-2. Loader queues registrations in `pendingProviderRegistrations`.
-3. Runner binds core and flushes queue into `modelRegistry.registerProvider(...)`.
-4. Registry applies replacement or override logic and keeps registrations for refresh.
-
-Rules of thumb:
-- `models` provided => requires `baseUrl` + (`apiKey` or `oauth`).
-- only `baseUrl/headers` => override existing provider models.
-- custom stream via `streamSimple` => requires `api`.
-
-### Qwen Provider (key source aligned with `~/.pi/agent/extensions/web-fetch/`)
-
-`web-fetch/providers.ts` uses this priority:
-1. `~/.qwen/oauth_creds.json` (`access_token`, not expired)
-2. `~/.cli-proxy-api/qwen-*.json` (`access_token` / `api_key`, newest first)
-
-You can mirror that in provider injection using shell-resolved `apiKey` (`!` prefix):
-
-```typescript
-pi.registerProvider("qwen", {
-  baseUrl: "https://portal.qwen.ai/v1",
-  api: "openai-responses",
-  authHeader: true,
-  apiKey: "!python3 -c \"import json,glob,os,time; p=os.path.expanduser('~/.qwen/oauth_creds.json');\nif os.path.exists(p):\n d=json.load(open(p));\n t=d.get('access_token'); e=d.get('expiry_date',0);\n if t and e>int(time.time()*1000): print(t); raise SystemExit\nfs=sorted(glob.glob(os.path.expanduser('~/.cli-proxy-api/qwen-*.json')), key=lambda f: os.path.getmtime(f), reverse=True)\nfor f in fs:\n d=json.load(open(f)); t=d.get('access_token') or d.get('api_key');\n if t and not d.get('disabled'): print(t); break\"",
-  models: [
-    {
-      id: "qwen-max",
-      name: "Qwen Max",
-      reasoning: true,
-      input: ["text", "image"],
-      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
-      contextWindow: 131072,
-      maxTokens: 8192,
-    },
-  ],
-  headers: {
-    "X-DashScope-AuthType": "qwen-oauth",
-    "X-DashScope-CacheControl": "enable",
-    "X-DashScope-UserAgent": "QwenCode/0.10.3 (darwin; arm64)",
-  },
-});
-```
-
-Security note:
-- Never hardcode bearer token literals in extension files.
-- If a token was exposed in logs/chat, rotate it immediately.
-
----
-
-## Directory Structure
-
-```
-~/.pi/agent/skills/pi-extensions/
-├── SKILL.md                    # This file - entry point
-├── guides/
-│   ├── 01-quickstart.md        # First extension
-│   ├── 02-paradigms.md         # Core patterns
-│   ├── 03-state.md             # State management
-│   ├── 04-production.md        # Advanced architectures
-│   └── 05-rpc-mode.md          # RPC mode compatibility
-├── references/
-│   ├── api.md                  # Complete API
-│   ├── api-quickref.md         # Quick reference card
-│   ├── events.md               # Event reference
-│   ├── examples.md             # Code examples
-│   └── ui-components.md        # TUI components
-└── examples/
-    └── gallery.md              # Extension showcase
+// Utilities
+import { withFileMutationQueue } from "@mariozechner/pi-coding-agent";
+import { isToolCallEventType, isBashToolResult } from "@mariozechner/pi-coding-agent";
 ```
 
 ---
 
-## 🔧 Tools
+## Hot Topics
 
-### Search Pi Packages
+### Dynamic Model Injection
+Use `pi.registerProvider()` for proxies, custom endpoints, or team-wide model configs. See [`PATTERNS.md`](PATTERNS.md) §P19–P20 and [`guides/07-advanced-patterns.md`](guides/07-advanced-patterns.md).
 
-Search and browse packages from the pi.dev registry:
+### Tool Override
+Register a tool with the same name as a built-in (`read`, `bash`, `edit`, `write`) to wrap or replace it. See [`PATTERNS.md`](PATTERNS.md) §P4.
 
-```bash
-# Search by keyword
-bun ~/.pi/agent/skills/pi-extensions/scripts/search-packages.ts "mcp"
-bun ~/.pi/agent/skills/pi-extensions/scripts/search-packages.ts "theme"
-bun ~/.pi/agent/skills/pi-extensions/scripts/search-packages.ts "skill"
+### Parallel Execution Safety
+Custom tools that mutate files must use `withFileMutationQueue()` to avoid race conditions with built-in `edit`/`write`. See [`PATTERNS.md`](PATTERNS.md) §P5 and [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) §A4.
 
-# List top packages by downloads
-bun ~/.pi/agent/skills/pi-extensions/scripts/search-packages.ts
-```
-
-Features:
-- Fetches from npm registry API (`keywords:pi-package`)
-- Auto-categorizes: extension, skill, theme, prompt
-- Sorted by monthly downloads
-- Local file cache (15min TTL)
+### RPC Safety
+`ctx.hasUI` is `true` in RPC, but `custom()` returns `undefined`. Use `select`/`confirm`/`input`/`editor` for blocking dialogs that work in both modes. See [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) §A2 and [`guides/05-rpc-mode.md`](guides/05-rpc-mode.md).
 
 ---
 
-*Start your journey: [Quickstart →](guides/01-quickstart.md)*
+*Master references: [ARCHITECTURE](ARCHITECTURE.md) · [PATTERNS](PATTERNS.md) · [ANTI-PATTERNS](ANTI-PATTERNS.md)*
