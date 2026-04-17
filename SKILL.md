@@ -133,7 +133,11 @@ State is temporary cache? ─────────────────►
 
 ## 5-Minute Quick Test
 
+> **Prerequisite**: This skill is installed (cloned to `skills/pi-extensions`).
+> Below creates a **sample Extension**, placed in `~/.pi/agent/extensions/` — separate from the skill directory.
+
 ```bash
+# 1. Create the sample extension file
 mkdir -p ~/.pi/agent/extensions
 cat > ~/.pi/agent/extensions/hello.ts << 'EOF'
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
@@ -148,8 +152,12 @@ export default function (pi: ExtensionAPI) {
 }
 EOF
 
+# 2. Test with -e flag (temporary load)
 pi -e ~/.pi/agent/extensions/hello.ts
 # Then type: /hello
+#
+# Tip: Extensions in ~/.pi/agent/extensions/ are auto-discovered.
+#      The -e flag is only needed for temporary testing.
 ```
 
 ---

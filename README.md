@@ -5,35 +5,27 @@
 [![Pi](https://img.shields.io/badge/Pi-Extension%20Development-blue)](https://pi.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Overview
+## What is this Skill?
 
-This skill provides a structured learning path for developing Pi extensions—from your first "Hello World" to production-grade multi-mode session managers.
+This is a **Skill** (Markdown documentation) that teaches you how to build **Extensions** (TypeScript code).
 
-## Quick Start
+| Concept | Location | Purpose |
+|---------|----------|---------|
+| **Skill** (this) | `skills/` | Markdown docs that tell Pi "how to do X" |
+| **Extension** | `extensions/` | TypeScript code that runs at runtime |
+
+## Installation
 
 ```bash
-# Clone the skill
-git clone https://github.com/dwsy/pi-extensions-skill.git ~/.pi/agent/skills/pi-extensions
+# Install this skill to Pi's skills directory
+git clone https://github.com/dwsy/pi-extensions-skill.git \
+  ~/.pi/agent/skills/pi-extensions
 
-# Create your first extension
-mkdir -p ~/.pi/agent/extensions
-cat > ~/.pi/agent/extensions/hello.ts << 'EOF'
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
-
-export default function (pi: ExtensionAPI) {
-  pi.registerCommand("hello", {
-    description: "Say hello",
-    handler: async (_args, ctx) => {
-      ctx.ui.notify("Hello from Pi Extensions!", "success");
-    },
-  });
-}
-EOF
-
-# Run it
-pi -e ~/.pi/agent/extensions/hello.ts
-# Then type: /hello
+# Or copy to project-level skills
+cp -r ~/.pi/agent/skills/pi-extensions /path/to/project/.pi/skills/
 ```
+
+Pi auto-discovers skills. Once installed, it loads this skill when you mention "extension development".
 
 ## Learning Path
 
@@ -55,38 +47,58 @@ Pi extensions are TypeScript modules that hook into the Pi coding agent lifecycl
 - **Event Handlers**: React to and intercept system events
 - **Custom UI**: Build interactive terminal interfaces
 
-## Architecture
+## Extension Storage Locations
+
+Extensions you create go here (different from this skill!):
 
 ```
-SKILL.md                    # Entry point with decision tree
-guides/
-├── 01-quickstart.md        # First extension
-├── 02-paradigms.md         # Core patterns
-├── 03-state.md             # State management
-└── 04-production.md        # Advanced architectures
-references/
-└── api.md                  # API reference
-examples/
-└── gallery.md              # Real-world examples
-assets/
-└── templates/              # Starter templates
+~/.pi/agent/extensions/    ← Global extensions (available to all projects)
+.pi/extensions/            ← Project extensions (local to project)
 ```
 
-## Installation
+## Quick Test: Create a Sample Extension
 
-### As a Pi Skill
+> **Note**: This creates an **Extension**, not a Skill. They are separate things.
 
 ```bash
-# Clone to Pi skills directory
-git clone https://github.com/dwsy/pi-extensions-skill.git \
-  ~/.pi/agent/skills/pi-extensions
+# 1. Create the extension file
+mkdir -p ~/.pi/agent/extensions
+cat > ~/.pi/agent/extensions/hello.ts << 'EOF'
+import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+
+export default function (pi: ExtensionAPI) {
+  pi.registerCommand("hello", {
+    description: "Say hello",
+    handler: async (_args, ctx) => {
+      ctx.ui.notify("Hello from Pi Extensions!", "success");
+    },
+  });
+}
+EOF
+
+# 2. Test it (use -e for temporary load, or just restart Pi)
+pi -e ~/.pi/agent/extensions/hello.ts
+# Then type: /hello
 ```
 
-Then reference it in your Pi agent.
+## Directory Structure
 
-### Standalone Reference
-
-Browse the guides directly—each is self-contained with runnable examples.
+```
+pi-extensions-skill/
+├── SKILL.md                    # Skill entry point (this enables the skill)
+├── README.md                   # This file
+├── ARCHITECTURE.md             # Extension architecture (required reading)
+├── PATTERNS.md                 # 24 copy-paste patterns
+├── ANTI-PATTERNS.md           # 15 common mistakes with fixes
+├── guides/
+│   ├── 01-quickstart.md       # Beginner tutorial
+│   ├── 02-paradigms.md        # Core paradigms
+│   ├── 03-state.md            # State management
+│   ├── 04-production.md       # Production architecture
+│   └── ...                    # More guides
+└── references/
+    └── api.md                 # API reference
+```
 
 ## Featured Patterns
 
@@ -94,7 +106,7 @@ Browse the guides directly—each is self-contained with runnable examples.
 From `pi-interactive-shell`: Managing subprocesses with interactive/hands-free/dispatch modes.
 
 ### Workflow Orchestration
-From `pi-subagents`: Chain and parallel execution with template variables (`{task}`, `{previous}`).
+From `pi-subagents`: Chain and parallel execution with template variables.
 
 ### Defensive State Machine
 From `plan-mode`: Strict mode isolation with progressive permission release.
