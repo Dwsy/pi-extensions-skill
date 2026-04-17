@@ -1,11 +1,10 @@
 {
-  "name": "pi-skill-registry",
+  "name": "pi-extensions-skill",
+  "version": "1.0.0",
+  "description": "A comprehensive learning guide for building Pi coding agent extensions",
   "type": "module",
-  "scripts": {
-    "search": "bun run scripts/pi-skill-registry.ts search",
-    "eval": "bun run scripts/pi-skill-registry.ts eval",
-    "install": "bun run scripts/pi-skill-registry.ts install",
-    "discover": "bun run scripts/pi-skill-registry.ts discover",
-    "list": "bun run scripts/pi-skill-registry.ts list-installed"
+  "keywords": ["pi-package"],
+  "pi": {
+    "skills": ["."]
   }
 }
