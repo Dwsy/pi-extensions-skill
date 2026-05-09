@@ -230,7 +230,7 @@ Pi executes sibling tool calls in **parallel** by default. Without coordination,
 ### The Solution: `withFileMutationQueue()`
 
 ```typescript
-import { withFileMutationQueue } from "@mariozechner/pi-coding-agent";
+import { withFileMutationQueue } from "@earendil-works/pi-coding-agent";
 import { resolve, dirname } from "node:path";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 
@@ -271,7 +271,7 @@ Built-in tools support pluggable backends. Extensions can delegate `read`, `bash
 ### Bash Remote Example
 
 ```typescript
-import { createBashTool, createLocalBashOperations } from "@mariozechner/pi-coding-agent";
+import { createBashTool, createLocalBashOperations } from "@earendil-works/pi-coding-agent";
 
 pi.registerTool({
   ...createBashTool(cwd),

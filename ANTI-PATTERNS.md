@@ -91,7 +91,7 @@ async execute(_id, params, _signal, _onUpdate, ctx) {
 
 **✅ Correct:**
 ```typescript
-import { withFileMutationQueue } from "@mariozechner/pi-coding-agent";
+import { withFileMutationQueue } from "@earendil-works/pi-coding-agent";
 
 async execute(_id, params, _signal, _onUpdate, ctx) {
   const absolutePath = resolve(ctx.cwd, params.path);
@@ -189,7 +189,7 @@ parameters: Type.Object({
 
 **✅ Correct:**
 ```typescript
-import { StringEnum } from "@mariozechner/pi-ai";
+import { StringEnum } from "@earendil-works/pi-ai";
 
 parameters: Type.Object({
   action: StringEnum(["list", "add"] as const),

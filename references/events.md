@@ -185,7 +185,7 @@ pi.on("context", async (event, ctx) => {
 工具执行前触发，**可拦截**。
 
 ```typescript
-import { isToolCallEventType } from "@mariozechner/pi-coding-agent";
+import { isToolCallEventType } from "@earendil-works/pi-coding-agent";
 
 pi.on("tool_call", async (event, ctx) => {
   // 内置工具
@@ -207,7 +207,7 @@ pi.on("tool_call", async (event, ctx) => {
 工具执行后触发，**可修改结果**。
 
 ```typescript
-import { isBashToolResult } from "@mariozechner/pi-coding-agent";
+import { isBashToolResult } from "@earendil-works/pi-coding-agent";
 
 pi.on("tool_result", async (event, ctx) => {
   if (isBashToolResult(event)) {

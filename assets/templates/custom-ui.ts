@@ -5,7 +5,7 @@
  * 使用场景：表单、向导、游戏、仪表盘
  */
 
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
 	Editor,
 	Text,
@@ -13,7 +13,7 @@ import {
 	matchesKey,
 	Key,
 	truncateToWidth,
-} from "@mariozechner/pi-tui";
+} from "@earendil-works/pi-tui";
 
 export default function (pi: ExtensionAPI) {
 	pi.registerCommand("{{ui_command}}", {

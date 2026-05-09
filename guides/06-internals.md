@@ -51,7 +51,7 @@ Pi scans these locations at startup:
 
 ### jiti: TypeScript Without Compilation
 
-Pi uses **jiti** to load `.ts` files directly — no `tsc` needed. For the Bun-compiled binary, it uses `virtualModules` so imports like `@mariozechner/pi-coding-agent` resolve to the bundled packages even without `node_modules`.
+Pi uses **jiti** to load `.ts` files directly — no `tsc` needed. For the Bun-compiled binary, it uses `virtualModules` so imports like `@earendil-works/pi-coding-agent` resolve to the bundled packages even without `node_modules`.
 
 ```typescript
 // In Node.js/dev mode: alias resolution
@@ -353,7 +353,7 @@ What happens when you type `/reload` (or an extension calls `ctx.reload()`)?
 
 ## How Tools Become LLM-Callable
 
-Extensions register tools with `pi.registerTool()`. But the actual `Agent` from `@mariozechner/pi-agent-core` expects a different shape. `AgentSession` bridges this gap via `wrapToolsWithExtensions()` (in `wrapper.ts`):
+Extensions register tools with `pi.registerTool()`. But the actual `Agent` from `@earendil-works/pi-agent-core` expects a different shape. `AgentSession` bridges this gap via `wrapToolsWithExtensions()` (in `wrapper.ts`):
 
 ```typescript
 // Simplified

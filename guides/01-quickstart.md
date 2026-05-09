@@ -6,7 +6,7 @@
 
 ```bash
 cat > ~/.pi/agent/extensions/my-first.ts << 'EOF'
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
   // Register a simple command
@@ -70,7 +70,7 @@ pi.on("tool_call", async (event) => {
 
 ```typescript
 import { Type } from "@sinclair/typebox";
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
   let commandCount = 0;
@@ -115,6 +115,6 @@ export default function (pi: ExtensionAPI) {
 
 | Issue | Solution |
 |-------|----------|
-| `Cannot find module` | Ensure `@mariozechner/pi-coding-agent` is available |
+| `Cannot find module` | Ensure `@earendil-works/pi-coding-agent` is available |
 | Command not found | Check `pi -e` loaded the file correctly |
 | UI methods fail | Check `ctx.hasUI` before using UI |

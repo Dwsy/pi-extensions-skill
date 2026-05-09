@@ -249,7 +249,7 @@ const result = await ctx.ui.custom((tui, theme, _kb, done) => {
 ### 加载器
 
 ```typescript
-import { BorderedLoader } from "@mariozechner/pi-coding-agent";
+import { BorderedLoader } from "@earendil-works/pi-coding-agent";
 
 const result = await ctx.ui.custom((tui, theme, _kb, done) => {
   const loader = new BorderedLoader(tui, theme, "加载中...");
@@ -268,7 +268,7 @@ const result = await ctx.ui.custom((tui, theme, _kb, done) => {
 ### 设置列表
 
 ```typescript
-import { SettingsList, getSettingsListTheme } from "@mariozechner/pi-tui";
+import { SettingsList, getSettingsListTheme } from "@earendil-works/pi-tui";
 
 const items = [
   { id: "opt1", label: "选项1", currentValue: "on", values: ["on", "off"] },
@@ -303,7 +303,7 @@ import {
   formatSize,
   DEFAULT_MAX_BYTES,
   DEFAULT_MAX_LINES,
-} from "@mariozechner/pi-coding-agent";
+} from "@earendil-works/pi-coding-agent";
 
 const result = truncateHead(output, {
   maxLines: DEFAULT_MAX_LINES,
@@ -434,7 +434,7 @@ pi.registerProvider("anthropic", {
 ### Bash Spawn Hook
 
 ```typescript
-import { createBashTool } from "@mariozechner/pi-coding-agent";
+import { createBashTool } from "@earendil-works/pi-coding-agent";
 
 const bashTool = createBashTool(cwd, {
   spawnHook: ({ command, cwd, env }) => ({

@@ -1,5 +1,7 @@
 # Pi Extensions API 快速参考
 
+> **Note:** This is a Pi Extensions development reference. For project-specific tools (database commands, deployment, etc.), see your project's `.pi/skills/` directory.
+
 ## ExtensionAPI
 
 ### 事件
@@ -188,10 +190,10 @@ interface ToolResult {
 
 ```typescript
 // 核心类型
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 // 类型守卫
-import { isToolCallEventType, isBashToolResult } from "@mariozechner/pi-coding-agent";
+import { isToolCallEventType, isBashToolResult } from "@earendil-works/pi-coding-agent";
 
 // 截断工具
 import {
@@ -200,12 +202,12 @@ import {
   formatSize,
   DEFAULT_MAX_BYTES,
   DEFAULT_MAX_LINES,
-} from "@mariozechner/pi-coding-agent";
+} from "@earendil-works/pi-coding-agent";
 
 // TUI 组件
-import { Text, Container, Editor, matchesKey, Key } from "@mariozechner/pi-tui";
+import { Text, Container, Editor, matchesKey, Key } from "@earendil-works/pi-tui";
 
 // TypeBox
 import { Type } from "@sinclair/typebox";
-import { StringEnum } from "@mariozechner/pi-ai";
+import { StringEnum } from "@earendil-works/pi-ai";
 ```

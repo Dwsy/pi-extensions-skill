@@ -5,7 +5,7 @@
  * 触发方式：/commandname <参数>
  */
 
-import type { ExtensionAPI, AutocompleteItem } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, AutocompleteItem } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
 	pi.registerCommand("{{command_name}}", {

@@ -64,7 +64,7 @@ Extensions you create go here (different from this skill!):
 # 1. Create the extension file
 mkdir -p ~/.pi/agent/extensions
 cat > ~/.pi/agent/extensions/hello.ts << 'EOF'
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
   pi.registerCommand("hello", {

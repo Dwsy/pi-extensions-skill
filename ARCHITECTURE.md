@@ -239,7 +239,7 @@ pi.registerTool({
 Built-in tools run in parallel by default. If your custom tool edits files, use the mutation queue:
 
 ```typescript
-import { withFileMutationQueue } from "@mariozechner/pi-coding-agent";
+import { withFileMutationQueue } from "@earendil-works/pi-coding-agent";
 import { resolve } from "node:path";
 
 async execute(_id, params, _signal, _onUpdate, ctx) {
@@ -292,16 +292,16 @@ Need to replace editor entirely? ──────────► custom() or s
 
 ```typescript
 // Core types
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 // Schema
 import { Type } from "@sinclair/typebox";
-import { StringEnum } from "@mariozechner/pi-ai";  // Use for Google compat
+import { StringEnum } from "@earendil-works/pi-ai";  // Use for Google compat
 
 // TUI components
-import { Container, Text, SelectList } from "@mariozechner/pi-tui";
+import { Container, Text, SelectList } from "@earendil-works/pi-tui";
 
 // Utilities
-import { withFileMutationQueue } from "@mariozechner/pi-coding-agent";
-import { isToolCallEventType, isBashToolResult } from "@mariozechner/pi-coding-agent";
+import { withFileMutationQueue } from "@earendil-works/pi-coding-agent";
+import { isToolCallEventType, isBashToolResult } from "@earendil-works/pi-coding-agent";
 ```

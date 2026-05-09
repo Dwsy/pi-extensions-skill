@@ -24,8 +24,9 @@ The `guides/` and `references/` directories contain deeper narratives and exampl
 - **Writing a new extension?** → Read [`ARCHITECTURE.md`](ARCHITECTURE.md) §1–§5, then copy the matching pattern from [`PATTERNS.md`](PATTERNS.md).
 - **Extension is broken?** → Check [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) first.
 - **Need TUI component?** → [`PATTERNS.md`](PATTERNS.md) §P12–§P14, then [`guides/02-paradigms.md`](guides/02-paradigms.md) for narrative.
+- **Need beautiful TUI rendering?** → [`references/tui-beautiful-rendering.md`](references/tui-beautiful-rendering.md) — box drawing, overlays, badges, SVG widgets.
+- **Need multi-agent patterns?** → [`references/extension-patterns-from-source.md`](references/extension-patterns-from-source.md) — agent coordination, tasks, feeds.
 - **Need custom provider/OAuth?** → [`PATTERNS.md`](PATTERNS.md) §P19–§P20, then [`guides/07-advanced-patterns.md`](guides/07-advanced-patterns.md).
-- **Need event semantics?** → [`ARCHITECTURE.md`](ARCHITECTURE.md) §5, then [`references/events.md`](references/events.md).
 - **Need RPC safety?** → [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) §A2, then [`guides/05-rpc-mode.md`](guides/05-rpc-mode.md).
 
 ---
@@ -97,7 +98,7 @@ State is temporary cache? ─────────────────►
 | File | Purpose | Length |
 |------|---------|--------|
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Mental model, execution flow, exact event semantics | ~9KB |
-| [`PATTERNS.md`](PATTERNS.md) | 24 copy-paste patterns with exact imports | ~14KB |
+| [`PATTERNS.md`](PATTERNS.md) | 38 copy-paste patterns with exact imports | ~17KB |
 | [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) | 15 common mistakes with corrections | ~9KB |
 
 ### Progressive Guides (Read as Needed)
@@ -121,7 +122,14 @@ State is temporary cache? ─────────────────►
 | [`references/events.md`](references/events.md) | Full event reference |
 | [`references/examples.md`](references/examples.md) | Additional code examples |
 | [`references/ui-components.md`](references/ui-components.md) | TUI component catalog |
-| [`references/source-patterns.md`](references/source-patterns.md) | Patterns extracted from pi source |
+| [`references/extension-patterns-from-source.md`](references/extension-patterns-from-source.md) | Multi-agent, diff rendering, config patterns from 10+ extensions |
+| [`references/tui-beautiful-rendering.md`](references/tui-beautiful-rendering.md) | Beautiful TUI: box drawing, transcript, overlays, badges, SVG/HTML widgets |
+
+### Tutorials
+
+| File | Topic |
+|------|-------|
+| [`tutorials/tool-browser.md`](tutorials/tool-browser.md) | Build a searchable tool list with fuzzy filtering |
 
 ### Examples
 
@@ -140,7 +148,7 @@ State is temporary cache? ─────────────────►
 # 1. Create the sample extension file
 mkdir -p ~/.pi/agent/extensions
 cat > ~/.pi/agent/extensions/hello.ts << 'EOF'
-import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
   pi.registerCommand("hello", {
@@ -166,18 +174,18 @@ pi -e ~/.pi/agent/extensions/hello.ts
 
 ```typescript
 // Core types
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 // Schema
 import { Type } from "@sinclair/typebox";
-import { StringEnum } from "@mariozechner/pi-ai";
+import { StringEnum } from "@earendil-works/pi-ai";
 
 // TUI
-import { Container, Text, SelectList } from "@mariozechner/pi-tui";
+import { Container, Text, SelectList } from "@earendil-works/pi-tui";
 
 // Utilities
-import { withFileMutationQueue } from "@mariozechner/pi-coding-agent";
-import { isToolCallEventType, isBashToolResult } from "@mariozechner/pi-coding-agent";
+import { withFileMutationQueue } from "@earendil-works/pi-coding-agent";
+import { isToolCallEventType, isBashToolResult } from "@earendil-works/pi-coding-agent";
 ```
 
 ---

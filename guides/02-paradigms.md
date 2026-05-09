@@ -236,7 +236,7 @@ const text = await ctx.ui.editor("Edit:", "prefilled");
 ### Custom Component
 
 ```typescript
-import { Container, Text, SelectList } from "@mariozechner/pi-tui";
+import { Container, Text, SelectList } from "@earendil-works/pi-tui";
 
 const result = await ctx.ui.custom<string>((tui, theme, _kb, done) => {
   const container = new Container();

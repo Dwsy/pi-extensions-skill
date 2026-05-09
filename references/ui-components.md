@@ -137,7 +137,7 @@ ctx.ui.setFooter(undefined); // 恢复默认
 ### 自定义编辑器
 
 ```typescript
-import { CustomEditor } from "@mariozechner/pi-coding-agent";
+import { CustomEditor } from "@earendil-works/pi-coding-agent";
 
 class VimEditor extends CustomEditor {
   private mode: "normal" | "insert" = "insert";
@@ -160,7 +160,7 @@ ctx.ui.setEditorComponent(undefined); // 恢复默认
 ### Text
 
 ```typescript
-import { Text } from "@mariozechner/pi-tui";
+import { Text } from "@earendil-works/pi-tui";
 
 new Text("内容", paddingX, paddingY);
 ```
@@ -168,7 +168,7 @@ new Text("内容", paddingX, paddingY);
 ### Container
 
 ```typescript
-import { Container } from "@mariozechner/pi-tui";
+import { Container } from "@earendil-works/pi-tui";
 
 const container = new Container();
 container.addChild(component);
@@ -177,7 +177,7 @@ container.addChild(component);
 ### Editor
 
 ```typescript
-import { Editor } from "@mariozechner/pi-tui";
+import { Editor } from "@earendil-works/pi-tui";
 
 const editor = new Editor(tui, {
   borderColor: (s) => theme.fg("accent", s),
@@ -192,7 +192,7 @@ editor.handleInput(data);
 ### SettingsList
 
 ```typescript
-import { SettingsList, getSettingsListTheme } from "@mariozechner/pi-tui";
+import { SettingsList, getSettingsListTheme } from "@earendil-works/pi-tui";
 
 const settingsList = new SettingsList(
   items,                    // SettingItem[]
@@ -207,7 +207,7 @@ const settingsList = new SettingsList(
 ### BorderedLoader
 
 ```typescript
-import { BorderedLoader } from "@mariozechner/pi-coding-agent";
+import { BorderedLoader } from "@earendil-works/pi-coding-agent";
 
 const loader = new BorderedLoader(tui, theme, "加载中...");
 loader.onAbort = () => done(null);
@@ -217,7 +217,7 @@ loader.signal // AbortSignal
 ## 键盘处理
 
 ```typescript
-import { matchesKey, Key } from "@mariozechner/pi-tui";
+import { matchesKey, Key } from "@earendil-works/pi-tui";
 
 if (matchesKey(data, Key.up)) { /* 上箭头 */ }
 if (matchesKey(data, Key.down)) { /* 下箭头 */ }
@@ -247,7 +247,7 @@ theme.strikethrough(text)
 ## 代码高亮
 
 ```typescript
-import { highlightCode, getLanguageFromPath } from "@mariozechner/pi-coding-agent";
+import { highlightCode, getLanguageFromPath } from "@earendil-works/pi-coding-agent";
 
 const highlighted = highlightCode(code, "typescript", theme);
 

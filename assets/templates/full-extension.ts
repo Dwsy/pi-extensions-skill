@@ -5,9 +5,9 @@
  * 功能：简单的待办事项管理
  */
 
-import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
+import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
-import { Text, Container, SettingsList, getSettingsListTheme } from "@mariozechner/pi-tui";
+import { Text, Container, SettingsList, getSettingsListTheme } from "@earendil-works/pi-tui";
 
 // 状态类型
 interface TodoItem {
