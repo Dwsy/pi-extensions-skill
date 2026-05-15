@@ -376,8 +376,12 @@ const choice = await ctx.ui.custom<string | null>((tui, theme, _kb, done) => {
     { value: "b", label: "Option B" },
   ];
 
-  const list = new SelectList(items, 5, {
-    selectedText: (t) => theme.fg("accent", t),
+  const list = new SelectList(items, Math.min(items.length, 10), {
+    selectedPrefix: (t) => theme.fg("accent", t),
+    selectedText: (t) => theme.fg("accent", theme.bold(t)),
+    description: (t) => theme.fg("muted", t),
+    scrollInfo: (t) => theme.fg("dim", t),
+    noMatch: (t) => theme.fg("warning", t),
   });
   list.onSelect = (item) => done(item.value);
   list.onCancel = () => done(null);
