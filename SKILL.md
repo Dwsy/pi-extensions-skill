@@ -23,6 +23,7 @@ The `guides/` and `references/` directories contain deeper narratives and exampl
 
 - **Writing a new extension?** → Read [`ARCHITECTURE.md`](ARCHITECTURE.md) §1–§5, then copy the matching pattern from [`PATTERNS.md`](PATTERNS.md).
 - **Extension is broken?** → Check [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) first.
+- **Extension is slow to start?** → [`references/startup-optimization.md`](references/startup-optimization.md) — jiti bottleneck, .js vs .ts, discovery cost.
 - **Need TUI component?** → [`PATTERNS.md`](PATTERNS.md) §P12–§P14, then [`guides/02-paradigms.md`](guides/02-paradigms.md) for narrative.
 - **Need beautiful TUI rendering?** → [`references/tui-beautiful-rendering.md`](references/tui-beautiful-rendering.md) — box drawing, overlays, badges, SVG widgets.
 - **Need multi-agent patterns?** → [`references/extension-patterns-from-source.md`](references/extension-patterns-from-source.md) — agent coordination, tasks, feeds.
@@ -62,6 +63,9 @@ I need RPC mode specifics
 
 I need pi internals (loader, runner, binding)
   └─► guides/06-internals.md
+
+I need startup optimization, speed up extension loading
+  └─► references/startup-optimization.md
 
 I need provider plugins, OAuth, overrides
   └─► guides/07-advanced-patterns.md
@@ -124,6 +128,7 @@ State is temporary cache? ─────────────────►
 | [`references/ui-components.md`](references/ui-components.md) | TUI component catalog |
 | [`references/extension-patterns-from-source.md`](references/extension-patterns-from-source.md) | Multi-agent, diff rendering, config patterns from 10+ extensions |
 | [`references/tui-beautiful-rendering.md`](references/tui-beautiful-rendering.md) | Beautiful TUI: box drawing, transcript, overlays, badges, SVG/HTML widgets |
+| [`references/startup-optimization.md`](references/startup-optimization.md) | Startup perf: jiti transpilation, .js vs .ts, measuring bottlenecks |
 
 ### Tutorials
 
