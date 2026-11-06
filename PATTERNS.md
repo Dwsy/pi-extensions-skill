@@ -644,7 +644,7 @@ pi.registerCommand("fast", {
       return;
     }
     const ok = await pi.setModel(fast);
-    ctx.ui.notify(ok ? "Switched to fast model" : "No API key", ok ? "success" : "error");
+    ctx.ui.notify(ok ? "Switched to fast model" : "No API key", ok ? "info" : "error");
   },
 });
 ```

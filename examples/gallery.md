@@ -58,12 +58,12 @@ socket.on("data", (data) => {
 // Custom termination tool
 pi.registerTool({
   name: "signal_loop_success",
-  label: "标记循环成功",
-  description: "当跳出条件满足时停止当前循环",
+  label: "Mark loop succeeded",
+  description: "Stop the current loop when the exit condition is met",
   parameters: Type.Object({}),
   async execute(_id, _params, _signal, _onUpdate, ctx) {
     clearLoopState(ctx);
-    return { content: [{ type: "text", text: "循环已结束" }] };
+    return { content: [{ type: "text", text: "Loop finished" }] };
   },
 });
 

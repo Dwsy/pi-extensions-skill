@@ -1,15 +1,15 @@
 /**
- * 完整扩展示例
+ * Full extension example
  *
- * 展示如何组合工具、命令、事件和 UI
- * 功能：简单的待办事项管理
+ * Shows how to combine tools, commands, events and UI
+ * Purpose: a simple todo manager
  */
 
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { Text, Container, SettingsList, getSettingsListTheme } from "@earendil-works/pi-tui";
 
-// 状态类型
+// state types
 interface TodoItem {
 	id: string;
 	text: string;
@@ -22,10 +22,10 @@ interface TodoState {
 }
 
 export default function (pi: ExtensionAPI) {
-	// 内存中的状态
+	// in-memory state
 	let todos: TodoItem[] = [];
 
-	// ========== 状态管理 ==========
+	// ========== state management ==========
 
 	function persistState() {
 		pi.appendEntry<TodoState>("todo-state", { items: todos });
@@ -44,22 +44,22 @@ export default function (pi: ExtensionAPI) {
 		}
 	}
 
-	// ========== 工具 ==========
+	// ========== tools ==========
 
 	pi.registerTool({
 		name: "todo",
 		label: "Todo",
-		description: "管理待办事项：列出、添加、完成、删除任务",
+		description: "Manage todos: list, add, complete, delete",
 
 		parameters: Type.Object({
 			action: Type.String({
-				description: "操作: list, add, complete, delete",
+				description: "Action: list, add, complete, delete",
 			}),
 			text: Type.Optional(Type.String({
-				description: "任务内容（add 时需要）",
+				description: "Todo text (required for add)",
 			})),
 			id: Type.Optional(Type.String({
-				description: "任务 ID（complete/delete 时需要）",
+				description: "Todo ID (required for complete/delete)",
 			})),
 		}),
 
@@ -70,7 +70,7 @@ export default function (pi: ExtensionAPI) {
 				case "list": {
 					if (todos.length === 0) {
 						return {
-							content: [{ type: "text", text: "暂无待办事项" }],
+							content: [{ type: "text", text: "No todos yet" }],
 							details: { items: [] },
 						};
 					}
@@ -88,7 +88,7 @@ export default function (pi: ExtensionAPI) {
 				case "add": {
 					if (!text?.trim()) {
 						return {
-							content: [{ type: "text", text: "请提供任务内容" }],
+							content: [{ type: "text", text: "Please provide todo text" }],
 							isError: true,
 						};
 					}
@@ -104,7 +104,7 @@ export default function (pi: ExtensionAPI) {
 					persistState();
 
 					return {
-						content: [{ type: "text", text: `添加: ${newTodo.text}` }],
+						content: [{ type: "text", text: `Added: ${newTodo.text}` }],
 						details: { items: todos },
 					};
 				}
@@ -112,7 +112,7 @@ export default function (pi: ExtensionAPI) {
 				case "complete": {
 					if (!id) {
 						return {
-							content: [{ type: "text", text: "请提供任务 ID" }],
+							content: [{ type: "text", text: "Please provide a todo ID" }],
 							isError: true,
 						};
 					}
@@ -120,7 +120,7 @@ export default function (pi: ExtensionAPI) {
 					const todo = todos.find((t) => t.id === id);
 					if (!todo) {
 						return {
-							content: [{ type: "text", text: `未找到任务: ${id}` }],
+							content: [{ type: "text", text: `Todo not found: ${id}` }],
 							isError: true,
 						};
 					}
@@ -129,7 +129,7 @@ export default function (pi: ExtensionAPI) {
 					persistState();
 
 					return {
-						content: [{ type: "text", text: `${todo.completed ? "完成" : "取消完成"}: ${todo.text}` }],
+						content: [{ type: "text", text: `${todo.completed ? "Done" : "Reopened"}: ${todo.text}` }],
 						details: { items: todos },
 					};
 				}
@@ -137,7 +137,7 @@ export default function (pi: ExtensionAPI) {
 				case "delete": {
 					if (!id) {
 						return {
-							content: [{ type: "text", text: "请提供任务 ID" }],
+							content: [{ type: "text", text: "Please provide a todo ID" }],
 							isError: true,
 						};
 					}
@@ -145,7 +145,7 @@ export default function (pi: ExtensionAPI) {
 					const index = todos.findIndex((t) => t.id === id);
 					if (index === -1) {
 						return {
-							content: [{ type: "text", text: `未找到任务: ${id}` }],
+							content: [{ type: "text", text: `Todo not found: ${id}` }],
 							isError: true,
 						};
 					}
@@ -154,14 +154,14 @@ export default function (pi: ExtensionAPI) {
 					persistState();
 
 					return {
-						content: [{ type: "text", text: `删除: ${deleted.text}` }],
+						content: [{ type: "text", text: `Deleted: ${deleted.text}` }],
 						details: { items: todos },
 					};
 				}
 
 				default:
 					return {
-						content: [{ type: "text", text: `未知操作: ${action}` }],
+						content: [{ type: "text", text: `Unknown action: ${action}` }],
 						isError: true,
 					};
 			}
@@ -176,20 +176,20 @@ export default function (pi: ExtensionAPI) {
 		},
 
 		renderResult(result, { isPartial }, theme) {
-			if (isPartial) return new Text(theme.fg("warning", "处理中..."), 0, 0);
-			if (result.isError) return new Text(theme.fg("error", "✗ 失败"), 0, 0);
-			return new Text(theme.fg("success", "✓ 成功"), 0, 0);
+			if (isPartial) return new Text(theme.fg("warning", "Working..."), 0, 0);
+			if (result.isError) return new Text(theme.fg("error", "✗ Failed"), 0, 0);
+			return new Text(theme.fg("success", "✓ Success"), 0, 0);
 		},
 	});
 
-	// ========== 命令 ==========
+	// ========== commands ==========
 
 	pi.registerCommand("todos", {
-		description: "打开待办事项管理器",
+		description: "Open the todo manager",
 
 		handler: async (_args, ctx) => {
 			if (!ctx.hasUI) {
-				ctx.ui.notify("需要交互模式", "error");
+				ctx.ui.notify("Interactive mode required", "error");
 				return;
 			}
 
@@ -197,15 +197,15 @@ export default function (pi: ExtensionAPI) {
 				const items = todos.map((t) => ({
 					id: t.id,
 					label: t.text,
-					currentValue: t.completed ? "已完成" : "未完成",
-					values: ["已完成", "未完成", "删除"],
+					currentValue: t.completed ? "Done" : "Pending",
+					values: ["Done", "Pending", "Delete"],
 				}));
 
 				const container = new Container();
 
 				container.addChild({
 					render(_w) {
-						return [theme.fg("accent", theme.bold("待办事项")), ""];
+						return [theme.fg("accent", theme.bold("Todos")), ""];
 					},
 					invalidate() {},
 				});
@@ -215,12 +215,12 @@ export default function (pi: ExtensionAPI) {
 					Math.min(items.length + 2, 10),
 					getSettingsListTheme(),
 					(id, newValue) => {
-						if (newValue === "删除") {
+						if (newValue === "Delete") {
 							todos = todos.filter((t) => t.id !== id);
 						} else {
 							const todo = todos.find((t) => t.id === id);
 							if (todo) {
-								todo.completed = newValue === "已完成";
+								todo.completed = newValue === "Done";
 							}
 						}
 						persistState();
@@ -228,7 +228,7 @@ export default function (pi: ExtensionAPI) {
 					},
 					() => done(undefined),
 					(newText) => {
-						// 添加新任务
+						// add a new todo
 						if (newText?.trim()) {
 							todos.push({
 								id: Date.now().toString(36),
@@ -260,7 +260,7 @@ export default function (pi: ExtensionAPI) {
 		},
 	});
 
-	// ========== 事件 ==========
+	// ========== events ==========
 
 	pi.on("session_start", async (_event, ctx) => {
 		restoreFromBranch(ctx);
@@ -270,7 +270,6 @@ export default function (pi: ExtensionAPI) {
 		restoreFromBranch(ctx);
 	});
 
-	pi.on("session_fork", async (_event, ctx) => {
-		restoreFromBranch(ctx);
-	});
+	// Pi 1.5.0 has no post-fork event. Restore branch state from
+	// session_start / session_tree instead (see references/api-surface-1.5.md).
 }

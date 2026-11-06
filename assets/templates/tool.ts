@@ -1,8 +1,8 @@
 /**
- * 基础工具模板
+ * Basic tool template
  *
- * 功能：描述工具的功能
- * 使用场景：何时使用此工具
+ * Purpose: describe what the tool does
+ * Use cases: when to use this tool
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -14,47 +14,47 @@ export default function (pi: ExtensionAPI) {
 	pi.registerTool({
 		name: "{{tool_name}}",
 		label: "{{Tool Label}}",
-		description: "{{工具功能描述，LLM 将看到此描述}}",
+		description: "{{tool description, visible to the LLM}}",
 
 		parameters: Type.Object({
 			action: StringEnum(["list", "add", "delete"] as const, {
-				description: "要执行的操作",
+				description: "Action to perform",
 			}),
 			name: Type.Optional(Type.String({
-				description: "项目名称",
+				description: "Item name",
 			})),
 		}),
 
 		async execute(toolCallId, params, signal, onUpdate, ctx) {
 			const { action, name } = params;
 
-			// 检查取消信号
+			// check the abort signal
 			if (signal?.aborted) {
 				return {
-					content: [{ type: "text", text: "已取消" }],
+					content: [{ type: "text", text: "Cancelled" }],
 					details: { cancelled: true },
 				};
 			}
 
-			// 流式更新进度
+			// stream progress updates
 			onUpdate?.({
-				content: [{ type: "text", text: "处理中..." }],
+				content: [{ type: "text", text: "Working..." }],
 				details: { progress: 50 },
 			});
 
 			try {
-				// 执行实际逻辑
+				// perform the real work
 				let result: string;
 
 				switch (action) {
 					case "list":
-						result = "列出所有项目";
+						result = "Listed all items";
 						break;
 					case "add":
-						result = name ? `添加项目: ${name}` : "请提供项目名称";
+						result = name ? `Added item: ${name}` : "Please provide an item name";
 						break;
 					case "delete":
-						result = name ? `删除项目: ${name}` : "请提供项目名称";
+						result = name ? `Deleted item: ${name}` : "Please provide an item name";
 						break;
 				}
 
@@ -64,14 +64,14 @@ export default function (pi: ExtensionAPI) {
 				};
 			} catch (error) {
 				return {
-					content: [{ type: "text", text: `错误: ${error}` }],
+					content: [{ type: "text", text: `Error: ${error}` }],
 					isError: true,
 					details: { error: String(error) },
 				};
 			}
 		},
 
-		// 自定义工具调用渲染（可选）
+		// custom tool-call renderer (optional)
 		renderCall(args, theme) {
 			let text = theme.fg("toolTitle", theme.bold(`${args.action} `));
 			if (args.name) {
@@ -80,17 +80,17 @@ export default function (pi: ExtensionAPI) {
 			return new Text(text, 0, 0);
 		},
 
-		// 自定义结果渲染（可选）
+		// custom result renderer (optional)
 		renderResult(result, { expanded, isPartial }, theme) {
 			if (isPartial) {
-				return new Text(theme.fg("warning", "处理中..."), 0, 0);
+				return new Text(theme.fg("warning", "Working..."), 0, 0);
 			}
 
 			if (result.isError) {
 				return new Text(theme.fg("error", `✗ ${result.content[0]?.text}`), 0, 0);
 			}
 
-			return new Text(theme.fg("success", "✓ 完成"), 0, 0);
+			return new Text(theme.fg("success", "✓ Done"), 0, 0);
 		},
 	});
 }

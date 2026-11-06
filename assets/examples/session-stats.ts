@@ -1,7 +1,7 @@
 /**
- * 会话统计扩展
+ * Session statistics extension
  *
- * 提供 /stats 命令查看会话统计信息
+ * Provides /stats to show session statistics
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -9,17 +9,17 @@ import { Text } from "@earendil-works/pi-tui";
 
 export default function (pi: ExtensionAPI) {
 	pi.registerCommand("stats", {
-		description: "显示会话统计信息",
+		description: "Show session statistics",
 
 		handler: async (_args, ctx) => {
 			if (!ctx.hasUI) {
-				// 非交互模式：输出到控制台
+				// non-interactive mode: print to the console
 				const entries = ctx.sessionManager.getEntries();
-				console.log(`条目数: ${entries.length}`);
+				console.log(`Entries: ${entries.length}`);
 				return;
 			}
 
-			// 收集统计信息
+			// collect statistics
 			const entries = ctx.sessionManager.getEntries();
 			const branch = ctx.sessionManager.getBranch();
 			const leafId = ctx.sessionManager.getLeafId();
@@ -41,46 +41,46 @@ export default function (pi: ExtensionAPI) {
 
 			const usage = ctx.getContextUsage();
 
-			// 格式化输出
+			// format the output
 			const lines = [
 				"",
-				"📊 会话统计",
+				"📊 Session statistics",
 				"─".repeat(30),
-				`总条目: ${entries.length}`,
-				`当前分支: ${branch.length}`,
-				`当前叶子: ${leafId?.slice(0, 8) || "N/A"}...`,
+				`Total entries: ${entries.length}`,
+				`Current branch: ${branch.length}`,
+				`Current leaf: ${leafId?.slice(0, 8) || "N/A"}...`,
 				"",
-				`用户消息: ${userMessages}`,
-				`助手消息: ${assistantMessages}`,
-				`工具调用: ${toolCalls}`,
+				`User messages: ${userMessages}`,
+				`Assistant messages: ${assistantMessages}`,
+				`Tool calls: ${toolCalls}`,
 			];
 
 			if (usage) {
 				lines.push(
 					"",
-					`Token 使用: ${usage.tokens.toLocaleString()}`,
-					`上下文窗口: ${usage.contextWindow.toLocaleString()}`,
-					`使用率: ${(usage.tokens / usage.contextWindow * 100).toFixed(1)}%`,
+					`Token usage: ${usage.tokens.toLocaleString()}`,
+					`Context window: ${usage.contextWindow.toLocaleString()}`,
+					`Utilization: ${(usage.tokens / usage.contextWindow * 100).toFixed(1)}%`,
 				);
 			}
 
 			lines.push("─".repeat(30), "");
 
-			// 显示为控件
+			// display as a widget
 			ctx.ui.setWidget("session-stats", lines, { placement: "belowEditor" });
 
-			// 3 秒后自动清除
+			// clear automatically after 3 seconds
 			setTimeout(() => {
 				ctx.ui.setWidget("session-stats", undefined);
 			}, 5000);
 		},
 	});
 
-	// 注册工具让 LLM 也能获取统计
+	// register a tool so the LLM can fetch stats too
 	pi.registerTool({
 		name: "get_session_stats",
 		label: "Get Session Stats",
-		description: "获取当前会话的统计信息",
+		description: "Get statistics for the current session",
 		parameters: {},
 
 		async execute(_id, _params, _signal, _onUpdate, ctx) {
@@ -90,14 +90,14 @@ export default function (pi: ExtensionAPI) {
 			return {
 				content: [{
 					type: "text",
-					text: `会话统计:\n- 总条目: ${entries.length}\n- Token 使用: ${usage?.tokens || "N/A"}`,
+					text: `Session stats:\n- Total entries: ${entries.length}\n- Token usage: ${usage?.tokens || "N/A"}`,
 				}],
 				details: { entryCount: entries.length, usage },
 			};
 		},
 
 		renderResult(result, _opts, theme) {
-			return new Text(theme.fg("success", "✓ 已获取会话统计"), 0, 0);
+			return new Text(theme.fg("success", "✓ Session stats fetched"), 0, 0);
 		},
 	});
 }

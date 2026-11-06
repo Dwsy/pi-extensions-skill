@@ -1,22 +1,22 @@
 /**
- * 权限门扩展示例
+ * Permission gate extension example
  *
- * 拦截危险命令和敏感路径访问
+ * Blocks dangerous commands and sensitive path access
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { isToolCallEventType } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
-	// 危险命令列表
+	// dangerous command patterns
 	const DANGEROUS_COMMANDS = [
-		{ pattern: /rm\s+-rf\s+\//, name: "删除根目录" },
-		{ pattern: /rm\s+-rf\s+~\/\./, name: "删除 home 目录配置" },
-		{ pattern: />\s*\/dev\/null/, name: "重定向到 null" },
-		{ pattern: /:\(\)\{\s*:\|:&\s*\};:/, name: "Fork 炸弹" },
+		{ pattern: /rm\s+-rf\s+\//, name: "delete root directory" },
+		{ pattern: /rm\s+-rf\s+~\/\./, name: "delete home dotfiles" },
+		{ pattern: />\s*\/dev\/null/, name: "redirect to null" },
+		{ pattern: /:\(\)\{\s*:\|:&\s*\};:/, name: "fork bomb" },
 	];
 
-	// 敏感路径列表
+	// sensitive paths
 	const SENSITIVE_PATHS = [
 		".env",
 		".env.local",
@@ -30,7 +30,7 @@ export default function (pi: ExtensionAPI) {
 	];
 
 	pi.on("tool_call", async (event, ctx) => {
-		// 检查 bash 命令
+		// inspect bash commands
 		if (isToolCallEventType("bash", event)) {
 			const cmd = event.input.command;
 			if (!cmd) return;
@@ -38,48 +38,48 @@ export default function (pi: ExtensionAPI) {
 			for (const { pattern, name } of DANGEROUS_COMMANDS) {
 				if (pattern.test(cmd)) {
 					const ok = await ctx.ui.confirm(
-						"⚠️ 危险命令",
-						`检测到: ${name}\n命令: ${cmd}\n\n允许执行?`
+						"⚠️ Dangerous command",
+						`Detected: ${name}\nCommand: ${cmd}\n\nAllow execution?`
 					);
 					if (!ok) {
 						return {
 							block: true,
-							reason: `用户拒绝执行危险命令: ${name}`,
+							reason: `User rejected dangerous command: ${name}`,
 						};
 					}
 				}
 			}
 		}
 
-		// 检查敏感路径
+		// inspect sensitive paths
 		const path = event.input.path;
 		if (!path) return;
 
 		for (const sensitive of SENSITIVE_PATHS) {
 			if (path.includes(sensitive)) {
-				// 读取操作只警告
+				// read operations only warn
 				if (isToolCallEventType("read", event)) {
-					console.log(`[PermissionGate] 读取敏感路径: ${path}`);
+					console.log(`[PermissionGate] reading sensitive path: ${path}`);
 					return;
 				}
 
-				// 写入/编辑操作需要确认
+				// write/edit operations require confirmation
 				const ok = await ctx.ui.confirm(
-					"🔒 敏感路径",
-					`正在访问: ${path}\n\n允许操作?`
+					"🔒 Sensitive path",
+					`Accessing: ${path}\n\nAllow this operation?`
 				);
 				if (!ok) {
 					return {
 						block: true,
-						reason: `用户拒绝访问敏感路径: ${sensitive}`,
+						reason: `User rejected access to sensitive path: ${sensitive}`,
 					};
 				}
 			}
 		}
 	});
 
-	// 会话开始时显示提示
+	// show a hint when the session starts
 	pi.on("session_start", async (_event, ctx) => {
-		console.log("[PermissionGate] 权限门已激活");
+		console.log("[PermissionGate] permission gate active");
 	});
 }

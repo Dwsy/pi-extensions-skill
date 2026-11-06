@@ -214,7 +214,7 @@ Symptom: `Cannot find module '@earendil-works/pi-tui' from '.../src/command.ts'`
 
 ## 10. Copy contract for overlays
 
-- Footer: keep only the 3 highest-frequency actions (e.g. `↑↓ 选择 · Enter 详情 · ? 快捷键`). `?` opens a grouped shortcut reference. Do not maintain 4 width-dependent fallback strings — one string plus `truncateToWidth` is enough.
+- Footer: keep only the 3 highest-frequency actions (e.g. `↑↓ Select · Enter Open · ? Shortcuts`). `?` opens a grouped shortcut reference. Do not maintain 4 width-dependent fallback strings — one string plus `truncateToWidth` is enough.
 - Help layer: group by intent (navigation / filter & search / actions / other) instead of one flat key table duplicated from the footer.
 - Keep text that carries information no layout can: current input, destructive-action confirmations, units, empty-state reasons. Delete slogans and helper text that explains an obvious affordance.
 - Never advertise hover in the footer: it does not fire under terminal multiplexers.

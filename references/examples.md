@@ -1,16 +1,16 @@
-# Pi Extensions 代码示例
+# Pi Extensions Code Examples
 
-## 工具示例
+## Tool Examples
 
-### 基础工具
+### Basic Tool
 
 ```typescript
 pi.registerTool({
   name: "greet",
   label: "Greet",
-  description: "问候某人",
+  description: "Greet someone",
   parameters: Type.Object({
-    name: Type.String({ description: "名称" }),
+    name: Type.String({ description: "Name" }),
   }),
 
   async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
@@ -22,23 +22,23 @@ pi.registerTool({
 });
 ```
 
-### 带流式更新的工具
+### Tool with Streaming Updates
 
 ```typescript
 pi.registerTool({
   name: "long_task",
   label: "Long Task",
-  description: "长时间运行的任务",
+  description: "Long-running task",
   parameters: Type.Object({ steps: Type.Number() }),
 
   async execute(_toolCallId, params, signal, onUpdate, _ctx) {
     for (let i = 0; i < params.steps; i++) {
       if (signal?.aborted) {
-        return { content: [{ type: "text", text: "已取消" }] };
+        return { content: [{ type: "text", text: "Cancelled" }] };
       }
 
       onUpdate?.({
-        content: [{ type: "text", text: `步骤 ${i + 1}/${params.steps}...` }],
+        content: [{ type: "text", text: `Step ${i + 1}/${params.steps}...` }],
         details: { progress: (i + 1) / params.steps * 100 },
       });
 
@@ -46,25 +46,25 @@ pi.registerTool({
     }
 
     return {
-      content: [{ type: "text", text: "完成!" }],
+      content: [{ type: "text", text: "Done!" }],
       details: { completed: true },
     };
   },
 });
 ```
 
-### 带自定义渲染的工具
+### Tool with a Custom Renderer
 
 ```typescript
 pi.registerTool({
   name: "process_files",
   label: "Process Files",
-  description: "处理文件",
+  description: "Process files",
   parameters: Type.Object({ files: Type.Array(Type.String()) }),
 
   async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
     return {
-      content: [{ type: "text", text: `处理了 ${params.files.length} 个文件` }],
+      content: [{ type: "text", text: `Processed ${params.files.length} files` }],
       details: { count: params.files.length, files: params.files },
     };
   },
@@ -90,24 +90,24 @@ pi.registerTool({
 });
 ```
 
-## 命令示例
+## Command Examples
 
-### 基础命令
+### Basic Command
 
 ```typescript
 pi.registerCommand("hello", {
-  description: "打招呼",
+  description: "Say hello",
   handler: async (args, ctx) => {
     ctx.ui.notify(`Hello ${args || "world"}!`, "info");
   },
 });
 ```
 
-### 带参数补全的命令
+### Command with Argument Completion
 
 ```typescript
 pi.registerCommand("deploy", {
-  description: "部署到环境",
+  description: "Deploy to an environment",
   getArgumentCompletions: (prefix) => {
     const envs = ["dev", "staging", "prod"];
     const items = envs.map(e => ({ value: e, label: e }));
@@ -119,21 +119,21 @@ pi.registerCommand("deploy", {
 });
 ```
 
-### 带自定义 UI 的命令
+### Command with Custom UI
 
 ```typescript
 pi.registerCommand("select", {
-  description: "选择选项",
+  description: "Pick an option",
   handler: async (_args, ctx) => {
-    const choice = await ctx.ui.select("选择:", ["A", "B", "C"]);
-    ctx.ui.notify(`选择了: ${choice}`, "info");
+    const choice = await ctx.ui.select("Choose:", ["A", "B", "C"]);
+    ctx.ui.notify(`Selected: ${choice}`, "info");
   },
 });
 ```
 
-## 事件处理器示例
+## Event Handler Examples
 
-### 权限门
+### Permission Gate
 
 ```typescript
 pi.on("tool_call", async (event, ctx) => {
@@ -141,14 +141,14 @@ pi.on("tool_call", async (event, ctx) => {
     const cmd = event.input.command;
 
     if (cmd?.includes("rm -rf")) {
-      const ok = await ctx.ui.confirm("危险!", `允许: ${cmd}?`);
-      if (!ok) return { block: true, reason: "用户拒绝" };
+      const ok = await ctx.ui.confirm("Danger!", `Allow: ${cmd}?`);
+      if (!ok) return { block: true, reason: "User rejected" };
     }
   }
 });
 ```
 
-### 路径保护
+### Path Guard
 
 ```typescript
 pi.on("tool_call", async (event, ctx) => {
@@ -156,36 +156,36 @@ pi.on("tool_call", async (event, ctx) => {
   const protectedPaths = [".env", "secrets.json", "node_modules/"];
 
   if (protectedPaths.some(p => path?.includes(p))) {
-    const ok = await ctx.ui.confirm("敏感路径!", `允许访问: ${path}?`);
-    if (!ok) return { block: true, reason: "路径被保护" };
+    const ok = await ctx.ui.confirm("Sensitive path!", `Allow access: ${path}?`);
+    if (!ok) return { block: true, reason: "Path is protected" };
   }
 });
 ```
 
-### 输入转换
+### Input Transformation
 
 ```typescript
 pi.on("input", async (event, ctx) => {
   if (event.text.startsWith("!")) {
     return {
       action: "transform",
-      text: `执行命令: ${event.text.slice(1)}`,
+      text: `Run command: ${event.text.slice(1)}`,
     };
   }
   return { action: "continue" };
 });
 ```
 
-## 状态管理示例
+## State Management Examples
 
-### 简单计数器
+### Simple Counter
 
 ```typescript
 export default function (pi: ExtensionAPI) {
   let count = 0;
 
   pi.on("session_start", async (_event, ctx) => {
-    // 从会话恢复
+    // restore from the session
     for (const entry of ctx.sessionManager.getEntries()) {
       if (entry.type === "custom" && entry.customType === "counter") {
         count = (entry.data as { count: number }).count;
@@ -196,7 +196,7 @@ export default function (pi: ExtensionAPI) {
   pi.registerTool({
     name: "counter",
     label: "Counter",
-    description: "计数器工具",
+    description: "Counter tool",
     parameters: Type.Object({ action: StringEnum(["get", "increment", "reset"]) }),
 
     async execute(_id, params, _signal, _onUpdate, _ctx) {
@@ -205,7 +205,7 @@ export default function (pi: ExtensionAPI) {
         case "reset": count = 0; break;
       }
 
-      // 持久化
+      // persist
       pi.appendEntry("counter", { count });
 
       return {
@@ -217,14 +217,14 @@ export default function (pi: ExtensionAPI) {
 }
 ```
 
-## 自定义 UI 示例
+## Custom UI Examples
 
-### 选择列表
+### Select List
 
 ```typescript
 const result = await ctx.ui.custom((tui, theme, _kb, done) => {
   let selected = 0;
-  const options = ["选项1", "选项2", "选项3"];
+  const options = ["Option 1", "Option 2", "Option 3"];
 
   function render(width: number): string[] {
     return options.map((opt, i) => {
@@ -246,17 +246,17 @@ const result = await ctx.ui.custom((tui, theme, _kb, done) => {
 });
 ```
 
-### 加载器
+### Loader
 
 ```typescript
 import { BorderedLoader } from "@earendil-works/pi-coding-agent";
 
 const result = await ctx.ui.custom((tui, theme, _kb, done) => {
-  const loader = new BorderedLoader(tui, theme, "加载中...");
+  const loader = new BorderedLoader(tui, theme, "Loading...");
 
   loader.onAbort = () => done(null);
 
-  // 异步工作
+  // async work
   doWork({ signal: loader.signal })
     .then(result => done(result))
     .catch(() => done(null));
@@ -265,14 +265,14 @@ const result = await ctx.ui.custom((tui, theme, _kb, done) => {
 });
 ```
 
-### 设置列表
+### Settings List
 
 ```typescript
 import { SettingsList, getSettingsListTheme } from "@earendil-works/pi-tui";
 
 const items = [
-  { id: "opt1", label: "选项1", currentValue: "on", values: ["on", "off"] },
-  { id: "opt2", label: "选项2", currentValue: "auto", values: ["auto", "manual"] },
+  { id: "opt1", label: "Option 1", currentValue: "on", values: ["on", "off"] },
+  { id: "opt2", label: "Option 2", currentValue: "auto", values: ["auto", "manual"] },
 ];
 
 await ctx.ui.custom((tui, theme, _kb, done) => {
@@ -292,9 +292,9 @@ await ctx.ui.custom((tui, theme, _kb, done) => {
 });
 ```
 
-## 实用工具
+## Utilities
 
-### 输出截断
+### Output Truncation
 
 ```typescript
 import {
@@ -311,34 +311,34 @@ const result = truncateHead(output, {
 });
 
 if (result.truncated) {
-  const msg = `[截断: ${result.outputLines}/${result.totalLines} 行 (${formatSize(result.outputBytes)}/${formatSize(result.totalBytes)})]`;
+  const msg = `[Truncated: ${result.outputLines}/${result.totalLines} lines (${formatSize(result.outputBytes)}/${formatSize(result.totalBytes)})]`;
 }
 ```
 
-### 执行命令
+### Execute a Command
 
 ```typescript
 const result = await pi.exec("git", ["status"], { signal, timeout: 5000 });
 // result.stdout, result.stderr, result.code, result.killed
 ```
 
-### 获取上下文使用
+### Get Context Usage
 
 ```typescript
 const usage = ctx.getContextUsage();
 if (usage && usage.tokens > 100_000) {
-  // 触发压缩或提醒
+  // trigger compaction or show a warning
 }
 ```
 
-### 模型切换
+### Model Switch
 
 ```typescript
 const model = ctx.modelRegistry.find("anthropic", "claude-sonnet-4");
 if (model) {
   const success = await pi.setModel(model);
   if (!success) {
-    ctx.ui.notify("无此模型的 API 密钥", "error");
+    ctx.ui.notify("No API key for this model", "error");
   }
 }
 ```

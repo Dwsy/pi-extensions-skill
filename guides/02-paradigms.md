@@ -141,7 +141,7 @@ pi.registerCommand("deploy", {
     
     try {
       await deploy(env);
-      ctx.ui.notify(`Deployed to ${env}`, "success");
+      ctx.ui.notify(`Deployed to ${env}`, "info");
     } catch (error) {
       ctx.ui.notify(`Deploy failed: ${error}`, "error");
     } finally {

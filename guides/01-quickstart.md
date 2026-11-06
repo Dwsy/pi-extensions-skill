@@ -14,7 +14,7 @@ export default function (pi: ExtensionAPI) {
     description: "Greet the user",
     handler: async (args, ctx) => {
       const name = args.trim() || "World";
-      ctx.ui.notify(`Hello, ${name}! 👋`, "success");
+      ctx.ui.notify(`Hello, ${name}! 👋`, "info");
     },
   });
 }

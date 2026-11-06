@@ -1,8 +1,8 @@
 /**
- * 自定义 UI 模板
+ * Custom UI template
  *
- * 功能：创建复杂的自定义交互界面
- * 使用场景：表单、向导、游戏、仪表盘
+ * Purpose: build a complex custom interactive UI
+ * Use cases: forms, wizards, games, dashboards
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
@@ -17,38 +17,38 @@ import {
 
 export default function (pi: ExtensionAPI) {
 	pi.registerCommand("{{ui_command}}", {
-		description: "打开自定义界面",
+		description: "Open custom UI",
 
 		handler: async (_args, ctx) => {
 			if (!ctx.hasUI) {
-				ctx.ui.notify("需要交互模式", "error");
+				ctx.ui.notify("Interactive mode required", "error");
 				return;
 			}
 
 			const result = await ctx.ui.custom<string | null>((tui, theme, keybindings, done) => {
-				// 状态
+				// state
 				let selectedIndex = 0;
 				let editMode = false;
 				let inputText = "";
 
-				// 选项
-				const options = ["选项 A", "选项 B", "选项 C", "自定义输入"];
+				// options
+				const options = ["Option A", "Option B", "Option C", "Custom input"];
 
-				// 编辑器（用于自定义输入模式）
+				// editor (used by the custom-input mode)
 				const editor = new Editor(tui, {
 					borderColor: (s) => theme.fg("accent", s),
 				});
 
 				editor.onSubmit = (value) => {
 					if (value.trim()) {
-						done(`自定义: ${value.trim()}`);
+						done(`Custom: ${value.trim()}`);
 					} else {
 						editMode = false;
 						tui.requestRender();
 					}
 				};
 
-				// 输入处理
+				// input handling
 				function handleInput(data: string) {
 					if (editMode) {
 						if (matchesKey(data, Key.escape)) {
@@ -76,7 +76,7 @@ export default function (pi: ExtensionAPI) {
 					if (matchesKey(data, Key.enter)) {
 						const selected = options[selectedIndex];
 
-						if (selected === "自定义输入") {
+						if (selected === "Custom input") {
 							editMode = true;
 							tui.requestRender();
 						} else {
@@ -90,18 +90,18 @@ export default function (pi: ExtensionAPI) {
 					}
 				}
 
-				// 渲染
+				// rendering
 				function render(width: number): string[] {
 					const lines: string[] = [];
 					const add = (s: string) => lines.push(truncateToWidth(s, width));
 
-					// 标题
+					// title
 					add(theme.fg("accent", "═".repeat(width)));
-					add(theme.fg("text", "  自定义界面示例"));
+					add(theme.fg("text", "  Custom UI example"));
 					add(theme.fg("accent", "═".repeat(width)));
 					lines.push("");
 
-					// 选项列表
+					// option list
 					for (let i = 0; i < options.length; i++) {
 						const opt = options[i];
 						const selected = i === selectedIndex;
@@ -113,21 +113,21 @@ export default function (pi: ExtensionAPI) {
 						add(`${prefix}${text}`);
 					}
 
-					// 编辑模式
+					// edit mode
 					if (editMode) {
 						lines.push("");
-						add(theme.fg("muted", "  输入内容:"));
+						add(theme.fg("muted", "  Input:"));
 						for (const line of editor.render(width - 4)) {
 							add(`  ${line}`);
 						}
 					}
 
-					// 帮助
+					// help
 					lines.push("");
 					if (editMode) {
-						add(theme.fg("dim", "  Enter 确认 • Esc 返回"));
+						add(theme.fg("dim", "  Enter confirm • Esc back"));
 					} else {
-						add(theme.fg("dim", "  ↑↓ 导航 • Enter 选择 • Esc 取消"));
+						add(theme.fg("dim", "  ↑↓ navigate • Enter select • Esc cancel"));
 					}
 					add(theme.fg("accent", "═".repeat(width)));
 
@@ -142,9 +142,9 @@ export default function (pi: ExtensionAPI) {
 			});
 
 			if (result) {
-				ctx.ui.notify(`选择: ${result}`, "success");
+				ctx.ui.notify(`Selected: ${result}`, "info");
 			} else {
-				ctx.ui.notify("已取消", "info");
+				ctx.ui.notify("Cancelled", "info");
 			}
 		},
 	});

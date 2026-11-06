@@ -75,6 +75,8 @@ User Input
 | `pi.exec(cmd, args, opts)` | Both | Shell execution |
 | `pi.events` | Runtime | Inter-extension bus |
 
+> **1.5.0 update**: `ExtensionAPI` has 32 distinct methods plus 42 typed `on` overloads; the table above is a subset. Missing from it: `getFlag`, `registerMarkdownTransformer`, `registerEntryRenderer`, `registerToolRenderer`, `getSettings`, `unregisterProvider`, `registerMcpServer` / `unregisterMcpServer` / `getMcpServers`, `registerVirtualModel` / `unregisterVirtualModel`. `pi.on(...)` returns an **unsubscribe** `() => void`, and `pi.setModel()` returns `Promise<boolean>` (await it). Full list: [`references/api-surface-1.5.md`](references/api-surface-1.5.md) §2.
+
 ---
 
 ## 4. ExtensionContext: What Handlers Receive
@@ -82,12 +84,19 @@ User Input
 ```typescript
 interface ExtensionContext {
   ui: ExtensionUIContext;      // Dialogs, widgets, custom components
+  mode: ExtensionMode;         // 1.5.0
   hasUI: boolean;              // false in print/JSON mode
   cwd: string;                 // Current working directory
   sessionManager: ReadonlySessionManager;
   modelRegistry: ModelRegistry;
   model: Model | undefined;
+  scopedModels: readonly ScopedModel[];   // 1.5.0
+  thinkingLevel?: ThinkingLevel;          // 1.5.0
+  signal: AbortSignal | undefined;        // 1.5.0 — use in long-running handlers
+  readonly tools: readonly AgentTool[];   // 1.5.0
   isIdle(): boolean;
+  isProjectTrusted(): boolean;            // 1.5.0
+  executeTool(name, args, options?): Promise<AgentToolCallOutcome>; // 1.5.0
   abort(): void;
   hasPendingMessages(): boolean;
   shutdown(): void;
@@ -100,14 +109,19 @@ interface ExtensionContext {
 **Command-only extras:**
 ```typescript
 interface ExtensionCommandContext extends ExtensionContext {
+  getSystemPromptOptions(): BuildSystemPromptOptions;  // 1.5.0
   waitForIdle(): Promise<void>;
   newSession(options?): Promise<{ cancelled }>;
-  fork(entryId): Promise<{ cancelled }>;
+  fork(entryId, options?): Promise<{ cancelled }>;
   navigateTree(targetId, options?): Promise<{ cancelled }>;
-  switchSession(path): Promise<{ cancelled }>;
+  switchSession(path, options?): Promise<{ cancelled }>;
   reload(): Promise<void>;
+  sendMessage(message, options?): void;
+  sendUserMessage(content, options?): void;
 }
 ```
+
+> Full `ctx` / `ctx.ui` member tables, all 42 events, and the current `ExtensionAPI` list: [`references/api-surface-1.5.md`](references/api-surface-1.5.md). That file is the authority when this narrative disagrees with a shipped `.d.ts`.
 
 ---
 

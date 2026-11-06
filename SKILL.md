@@ -23,6 +23,7 @@ The `guides/` and `references/` directories contain deeper narratives and exampl
 
 - **Writing a new extension?** → Read [`ARCHITECTURE.md`](ARCHITECTURE.md) §1–§5, then copy the matching pattern from [`PATTERNS.md`](PATTERNS.md).
 - **Extension is broken?** → Check [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) first.
+- **A handler never fires, or an API looks missing vs the installed Pi?** → [`references/api-surface-1.5.md`](references/api-surface-1.5.md) — verified 1.5.0 method/event tables and corrections to older docs in this skill.
 - **Extension is slow to start?** → [`references/startup-optimization.md`](references/startup-optimization.md) — jiti bottleneck, .js vs .ts, discovery cost.
 - **Need TUI component?** → [`PATTERNS.md`](PATTERNS.md) §P12–§P14, then [`guides/02-paradigms.md`](guides/02-paradigms.md) for narrative.
 - **Need beautiful TUI rendering?** → [`references/tui-beautiful-rendering.md`](references/tui-beautiful-rendering.md) — box drawing, overlays, badges, SVG widgets.
@@ -71,6 +72,9 @@ I need startup optimization, speed up extension loading
 
 I need mouse wheel, click, hover, or coordinate-safe delegation
   └─► references/tui-mouse-interaction.md
+
+I need the full current event/API list, or a handler that stopped firing
+  └─► references/api-surface-1.5.md
 
 I need provider plugins, OAuth, overrides
   └─► guides/07-advanced-patterns.md
@@ -134,6 +138,7 @@ State is temporary cache? ─────────────────►
 | [`references/extension-patterns-from-source.md`](references/extension-patterns-from-source.md) | Multi-agent, diff rendering, config patterns from 10+ extensions |
 | [`references/tui-beautiful-rendering.md`](references/tui-beautiful-rendering.md) | Beautiful TUI: box drawing, transcript, overlays, badges, SVG/HTML widgets |
 | [`references/tui-mouse-interaction.md`](references/tui-mouse-interaction.md) | Mouse wheel/click/hover contracts, `rowMap` hit-testing, wrapper coordinate translation, theming & standalone module-resolution pitfalls |
+| [`references/api-surface-1.5.md`](references/api-surface-1.5.md) | **Verified Pi 1.5.0**: full `ExtensionAPI` / `ExtensionContext` / `ctx.ui` method tables, all 42 events, corrections to older skill docs, official-doc navigation, upgrade re-verification |
 | [`references/startup-optimization.md`](references/startup-optimization.md) | Startup perf: jiti transpilation, .js vs .ts, measuring bottlenecks |
 
 ### Tutorials
@@ -165,7 +170,7 @@ export default function (pi: ExtensionAPI) {
   pi.registerCommand("hello", {
     description: "Say hello",
     handler: async (_args, ctx) => {
-      ctx.ui.notify("Hello from Pi Extensions!", "success");
+      ctx.ui.notify("Hello from Pi Extensions!", "info");
     },
   });
 }
@@ -215,6 +220,9 @@ Custom tools that mutate files must use `withFileMutationQueue()` to avoid race 
 
 ### RPC Safety
 `ctx.hasUI` is `true` in RPC, but `custom()` returns `undefined`. Use `select`/`confirm`/`input`/`editor` for blocking dialogs that work in both modes. See [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) §A2 and [`guides/05-rpc-mode.md`](guides/05-rpc-mode.md).
+
+### Current API Surface (Pi 1.5.0)
+`ARCHITECTURE.md` §3–§4 and `references/events.md` were written against an older surface: they omit ~12 API methods, ~22 events, and document two events (`session_switch`, `session_fork`) that **do not exist** in 1.5.0. Before trusting any method/event name, check [`references/api-surface-1.5.md`](references/api-surface-1.5.md) and the shipped `dist/core/extensions/types.d.ts`.
 
 ### TUI Mouse & Theming
 `ctx.ui.custom` components receive mouse events only in fullscreen mode, `move` defaults to no repaint, and a result without `handled`/`capture`/`focus` is discarded. Wrappers must translate `event.y` before delegating, and standalone extensions often cannot top-level value-import `@earendil-works/pi-tui` without breaking their tests. Full contracts: [`references/tui-mouse-interaction.md`](references/tui-mouse-interaction.md).

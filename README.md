@@ -70,7 +70,7 @@ export default function (pi: ExtensionAPI) {
   pi.registerCommand("hello", {
     description: "Say hello",
     handler: async (_args, ctx) => {
-      ctx.ui.notify("Hello from Pi Extensions!", "success");
+      ctx.ui.notify("Hello from Pi Extensions!", "info");
     },
   });
 }
@@ -122,7 +122,7 @@ This skill is extracted from real production extensions. Contributions welcome:
 2. Improve examples
 3. Fix bugs or clarify documentation
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Follow the three steps above to contribute.
 
 ## Credits
 

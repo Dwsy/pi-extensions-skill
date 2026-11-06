@@ -1,17 +1,17 @@
 /**
- * 基础命令模板
+ * Basic command template
  *
- * 功能：描述命令的功能
- * 触发方式：/commandname <参数>
+ * Purpose: describe what the command does
+ * Invocation: /commandname <args>
  */
 
 import type { ExtensionAPI, AutocompleteItem } from "@earendil-works/pi-coding-agent";
 
 export default function (pi: ExtensionAPI) {
 	pi.registerCommand("{{command_name}}", {
-		description: "{{命令描述}}",
+		description: "{{command description}}",
 
-		// 可选：参数自动补全
+		// optional: argument autocomplete
 		getArgumentCompletions: (prefix: string): AutocompleteItem[] | null => {
 			const options = ["option1", "option2", "option3"];
 			const items = options.map((e) => ({ value: e, label: e }));
@@ -20,46 +20,46 @@ export default function (pi: ExtensionAPI) {
 		},
 
 		handler: async (args, ctx) => {
-			// 检查 UI 可用性
+			// check UI availability
 			if (!ctx.hasUI) {
-				// 非交互模式下无法使用 UI
+				// UI is unavailable in non-interactive mode
 				return;
 			}
 
 			const trimmedArgs = args.trim();
 
-			// 无参数时显示帮助
+			// show help when no args are given
 			if (!trimmedArgs) {
-				ctx.ui.notify("用法: /{{command_name}} <参数>", "warning");
+				ctx.ui.notify("Usage: /{{command_name}} <args>", "warning");
 				return;
 			}
 
-			// 执行命令逻辑
+			// execute the command
 			try {
-				// 示例：选择对话框
-				const choice = await ctx.ui.select("选择操作:", [
-					"查看状态",
-					"执行操作",
-					"取消",
+				// example: a select dialog
+				const choice = await ctx.ui.select("Choose an action:", [
+					"View status",
+					"Run action",
+					"Cancel",
 				]);
 
-				if (choice === "取消" || choice === undefined) {
-					ctx.ui.notify("已取消", "info");
+				if (choice === "Cancel" || choice === undefined) {
+					ctx.ui.notify("Cancelled", "info");
 					return;
 				}
 
-				// 处理选择
+				// handle the selection
 				switch (choice) {
-					case "查看状态":
-						ctx.ui.notify(`当前参数: ${trimmedArgs}`, "info");
+					case "View status":
+						ctx.ui.notify(`Current args: ${trimmedArgs}`, "info");
 						break;
-					case "执行操作":
-						// 执行操作...
-						ctx.ui.notify("操作完成!", "success");
+					case "Run action":
+						// perform the action...
+						ctx.ui.notify("Done!", "info");
 						break;
 				}
 			} catch (error) {
-				ctx.ui.notify(`错误: ${error}`, "error");
+				ctx.ui.notify(`Error: ${error}`, "error");
 			}
 		},
 	});

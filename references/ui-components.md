@@ -1,140 +1,140 @@
-# Pi Extensions UI 组件参考
+# Pi Extensions UI Components Reference
 
-## 对话框
+## Dialogs
 
-### 选择器
+### Select
 
 ```typescript
-const choice = await ctx.ui.select("标题:", ["选项1", "选项2", "选项3"]);
-// 返回选中的字符串，或 undefined（取消）
+const choice = await ctx.ui.select("Title:", ["Option 1", "Option 2", "Option 3"]);
+// returns the selected string, or undefined when cancelled
 ```
 
-### 确认框
+### Confirm
 
 ```typescript
-const ok = await ctx.ui.confirm("标题", "消息内容");
-// 返回 boolean
+const ok = await ctx.ui.confirm("Title", "Message body");
+// returns boolean
 
-// 带超时
-const confirmed = await ctx.ui.confirm("标题", "消息", { timeout: 5000 });
+// with timeout
+const confirmed = await ctx.ui.confirm("Title", "Message", { timeout: 5000 });
 
-// 使用 AbortSignal
+// with AbortSignal
 const controller = new AbortController();
 setTimeout(() => controller.abort(), 5000);
-const confirmed = await ctx.ui.confirm("标题", "消息", { signal: controller.signal });
+const confirmed = await ctx.ui.confirm("Title", "Message", { signal: controller.signal });
 ```
 
-### 输入框
+### Input
 
 ```typescript
-const name = await ctx.ui.input("名称:", "占位符文本");
-// 返回输入的字符串，或 undefined（取消）
+const name = await ctx.ui.input("Name:", "Placeholder text");
+// returns the entered string, or undefined when cancelled
 ```
 
-### 编辑器
+### Editor
 
 ```typescript
-const text = await ctx.ui.editor("编辑:", "预设文本");
-// 返回编辑后的文本，或 undefined（取消）
+const text = await ctx.ui.editor("Edit:", "Prefilled text");
+// returns the edited text, or undefined when cancelled
 ```
 
-### 自定义组件
+### Custom Component
 
 ```typescript
 const result = await ctx.ui.custom((tui, theme, keybindings, done) => {
   return {
     render(width) {
-      return [theme.fg("accent", "自定义界面")];
+      return [theme.fg("accent", "Custom UI")];
     },
     invalidate() {},
     handleInput(data) {
-      if (data === "return") done("结果");
+      if (data === "return") done("result");
     },
   };
 });
 
-// 覆盖模式（浮层）
+// overlay mode
 const result = await ctx.ui.custom(
   (tui, theme, keybindings, done) => new MyComponent({ onClose: done }),
   { overlay: true }
 );
 ```
 
-## 状态控件
+## Status Controls
 
-### 通知
+### Notify
 
 ```typescript
-ctx.ui.notify("消息", "info");      // 信息
-ctx.ui.notify("警告", "warning");   // 警告
-ctx.ui.notify("错误", "error");     // 错误
-ctx.ui.notify("成功", "success");   // 成功
+ctx.ui.notify("Message", "info");      // informational
+ctx.ui.notify("Warning", "warning");   // warning
+ctx.ui.notify("Error", "error");       // error
+// 1.5.0 accepts only "info" | "warning" | "error" — there is no "success" type
 ```
 
-### 状态栏
+### Status Bar
 
 ```typescript
-ctx.ui.setStatus("my-ext", "处理中...");
-ctx.ui.setStatus("my-ext", undefined); // 清除
+ctx.ui.setStatus("my-ext", "Working...");
+ctx.ui.setStatus("my-ext", undefined); // clear
 ```
 
-### 控件
+### Widget
 
 ```typescript
-// 编辑器上方（默认）
-ctx.ui.setWidget("my-widget", ["行1", "行2"]);
+// above the editor (default)
+ctx.ui.setWidget("my-widget", ["Line 1", "Line 2"]);
 
-// 编辑器下方
-ctx.ui.setWidget("my-widget", ["行1", "行2"], { placement: "belowEditor" });
+// below the editor
+ctx.ui.setWidget("my-widget", ["Line 1", "Line 2"], { placement: "belowEditor" });
 
-// 自定义组件
+// custom component
 ctx.ui.setWidget("my-widget", (tui, theme) => new Text(...));
 
-// 清除
+// clear
 ctx.ui.setWidget("my-widget", undefined);
 ```
 
-### 工作消息
+### Working Message
 
 ```typescript
-ctx.ui.setWorkingMessage("思考中...");
-ctx.ui.setWorkingMessage(); // 恢复默认
+ctx.ui.setWorkingMessage("Thinking...");
+ctx.ui.setWorkingMessage(); // restore default
 ```
 
-### 编辑器文本
+### Editor Text
 
 ```typescript
-ctx.ui.setEditorText("预设文本");
+ctx.ui.setEditorText("Prefilled text");
 const current = ctx.ui.getEditorText();
 ```
 
-### 工具展开
+### Tool Expansion
 
 ```typescript
 const wasExpanded = ctx.ui.getToolsExpanded();
 ctx.ui.setToolsExpanded(true);
 ```
 
-### 终端标题
+### Terminal Title
 
 ```typescript
 ctx.ui.setTitle("pi - my-project");
 ```
 
-### 自定义底部栏
+### Custom Footer
 
 ```typescript
 ctx.ui.setFooter((tui, theme) => ({
   render(width) {
-    return [theme.fg("dim", "自定义底部")];
+    return [theme.fg("dim", "Custom footer")];
   },
   invalidate() {},
 }));
 
-ctx.ui.setFooter(undefined); // 恢复默认
+ctx.ui.setFooter(undefined); // restore default
 ```
 
-### 自定义编辑器
+### Custom Editor
 
 ```typescript
 import { CustomEditor } from "@earendil-works/pi-coding-agent";
@@ -143,8 +143,8 @@ class VimEditor extends CustomEditor {
   private mode: "normal" | "insert" = "insert";
 
   handleInput(data: string): void {
-    // 处理输入...
-    super.handleInput(data); // 传递未处理的按键
+    // handle input...
+    super.handleInput(data); // forward unhandled keys
   }
 }
 
@@ -152,17 +152,17 @@ ctx.ui.setEditorComponent((tui, theme, keybindings) =>
   new VimEditor(theme, keybindings)
 );
 
-ctx.ui.setEditorComponent(undefined); // 恢复默认
+ctx.ui.setEditorComponent(undefined); // restore default
 ```
 
-## TUI 组件
+## TUI Components
 
 ### Text
 
 ```typescript
 import { Text } from "@earendil-works/pi-tui";
 
-new Text("内容", paddingX, paddingY);
+new Text("Content", paddingX, paddingY);
 ```
 
 ### Container
@@ -184,7 +184,7 @@ const editor = new Editor(tui, {
 });
 
 editor.onSubmit = (value) => console.log(value);
-editor.setText("预设文本");
+editor.setText("Prefilled text");
 const lines = editor.render(width);
 editor.handleInput(data);
 ```
@@ -196,11 +196,11 @@ import { SettingsList, getSettingsListTheme } from "@earendil-works/pi-tui";
 
 const settingsList = new SettingsList(
   items,                    // SettingItem[]
-  maxHeight,                // 最大高度
-  getSettingsListTheme(),   // 主题
+  maxHeight,                // maximum height
+  getSettingsListTheme(),   // theme
   onValueChange,            // (id, newValue) => void
   onClose,                  // () => void
-  onNewItem                 // (text) => void（可选，用于添加新项）
+  onNewItem                 // (text) => void (optional, adds new items)
 );
 ```
 
@@ -209,44 +209,44 @@ const settingsList = new SettingsList(
 ```typescript
 import { BorderedLoader } from "@earendil-works/pi-coding-agent";
 
-const loader = new BorderedLoader(tui, theme, "加载中...");
+const loader = new BorderedLoader(tui, theme, "Loading...");
 loader.onAbort = () => done(null);
 loader.signal // AbortSignal
 ```
 
-## 键盘处理
+## Keyboard Handling
 
 ```typescript
 import { matchesKey, Key } from "@earendil-works/pi-tui";
 
-if (matchesKey(data, Key.up)) { /* 上箭头 */ }
-if (matchesKey(data, Key.down)) { /* 下箭头 */ }
-if (matchesKey(data, Key.enter)) { /* 回车 */ }
+if (matchesKey(data, Key.up)) { /* up arrow */ }
+if (matchesKey(data, Key.down)) { /* down arrow */ }
+if (matchesKey(data, Key.enter)) { /* enter */ }
 if (matchesKey(data, Key.escape)) { /* ESC */ }
 if (matchesKey(data, Key.tab)) { /* Tab */ }
 ```
 
-> 鼠标滚轮 / 点击 / hover、行命中 `rowMap`、wrapper 坐标平移与主题化陷阱：见 [`tui-mouse-interaction.md`](tui-mouse-interaction.md)。
+> Mouse wheel / click / hover, `rowMap` hit-testing, wrapper coordinate translation and theming pitfalls: see [`tui-mouse-interaction.md`](tui-mouse-interaction.md).
 
-## 主题颜色
+## Theme Colors
 
 ```typescript
-// 前景色
-theme.fg("toolTitle", text)   // 工具名称
-theme.fg("accent", text)      // 高亮
-theme.fg("success", text)     // 成功（绿）
-theme.fg("error", text)       // 错误（红）
-theme.fg("warning", text)     // 警告（黄）
-theme.fg("muted", text)       // 次要文本
-theme.fg("dim", text)         // 第三级文本
+// foreground colors
+theme.fg("toolTitle", text)   // tool name
+theme.fg("accent", text)      // highlight
+theme.fg("success", text)     // success (green)
+theme.fg("error", text)       // error (red)
+theme.fg("warning", text)     // warning (yellow)
+theme.fg("muted", text)       // secondary text
+theme.fg("dim", text)         // tertiary text
 
-// 样式
+// styles
 theme.bold(text)
 theme.italic(text)
 theme.strikethrough(text)
 ```
 
-## 代码高亮
+## Syntax Highlighting
 
 ```typescript
 import { highlightCode, getLanguageFromPath } from "@earendil-works/pi-coding-agent";

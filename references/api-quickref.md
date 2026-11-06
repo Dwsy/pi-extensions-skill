@@ -1,18 +1,18 @@
-# Pi Extensions API 快速参考
+# Pi Extensions API Quick Reference
 
 > **Note:** This is a Pi Extensions development reference. For project-specific tools (database commands, deployment, etc.), see your project's `.pi/skills/` directory.
 
 ## ExtensionAPI
 
-### 事件
+### Events
 
 ```typescript
 pi.on("session_start", handler)
 pi.on("session_shutdown", handler)
 pi.on("session_before_switch", handler)
-pi.on("session_switch", handler)
+// 1.5.0: no session_switch event exists
 pi.on("session_before_fork", handler)
-pi.on("session_fork", handler)
+// 1.5.0: no session_fork event exists
 pi.on("session_before_compact", handler)
 pi.on("session_compact", handler)
 pi.on("session_before_tree", handler)
@@ -30,7 +30,7 @@ pi.on("user_bash", handler)
 pi.on("model_select", handler)
 ```
 
-### 注册方法
+### Registration Methods
 
 ```typescript
 pi.registerTool(definition)
@@ -41,7 +41,7 @@ pi.registerMessageRenderer(customType, renderer)
 pi.registerProvider(name, config)
 ```
 
-### 消息和状态
+### Messages and State
 
 ```typescript
 pi.sendMessage(message, options)
@@ -52,7 +52,7 @@ pi.getSessionName()
 pi.setLabel(entryId, label)
 ```
 
-### 工具管理
+### Tool Management
 
 ```typescript
 pi.getActiveTools()
@@ -60,7 +60,7 @@ pi.getAllTools()
 pi.setActiveTools(names)
 ```
 
-### 其他
+### Other
 
 ```typescript
 pi.exec(command, args, options)
@@ -75,7 +75,7 @@ pi.events.emit(event, data)
 
 ## ExtensionContext
 
-### UI 方法
+### UI Methods
 
 ```typescript
 ctx.ui.select(title, options)
@@ -97,7 +97,7 @@ ctx.ui.setEditorComponent(factory?)
 ctx.ui.setTheme(nameOrTheme)
 ```
 
-### 属性
+### Properties
 
 ```typescript
 ctx.hasUI           // boolean
@@ -107,7 +107,7 @@ ctx.modelRegistry  // ModelRegistry
 ctx.model          // Model | undefined
 ```
 
-### 方法
+### Methods
 
 ```typescript
 ctx.isIdle()
@@ -121,7 +121,7 @@ ctx.getSystemPrompt()
 
 ## ExtensionCommandContext
 
-继承 ExtensionContext，额外提供：
+Extends `ExtensionContext` and adds:
 
 ```typescript
 ctx.waitForIdle()
@@ -130,7 +130,7 @@ ctx.fork(entryId)
 ctx.navigateTree(targetId, options?)
 ```
 
-## 类型定义
+## Type Definitions
 
 ### ToolDefinition
 
@@ -176,7 +176,7 @@ ctx.navigateTree(targetId, options?)
   { action: "continue" | "transform" | "handled"; text? } | void
 ```
 
-## 工具结果类型
+## Tool Result Types
 
 ```typescript
 interface ToolResult {
@@ -186,16 +186,16 @@ interface ToolResult {
 }
 ```
 
-## 常用导入
+## Common Imports
 
 ```typescript
-// 核心类型
+// core types
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
-// 类型守卫
+// type guards
 import { isToolCallEventType, isBashToolResult } from "@earendil-works/pi-coding-agent";
 
-// 截断工具
+// truncation helpers
 import {
   truncateHead,
   truncateTail,
@@ -204,7 +204,7 @@ import {
   DEFAULT_MAX_LINES,
 } from "@earendil-works/pi-coding-agent";
 
-// TUI 组件
+// TUI components
 import { Text, Container, Editor, matchesKey, Key } from "@earendil-works/pi-tui";
 
 // TypeBox

@@ -1,8 +1,11 @@
-# Pi Extensions 事件参考
+# Pi Extensions Event Reference
 
-完整的事件列表和用法。
+Payloads and usage for common events (narrative).
 
-## 生命周期概览
+> ⚠️ **Pi 1.5.0 has 42 events**; this file covers about 20. For the complete list, handler result types and per-event coverage see [`api-surface-1.5.md`](api-surface-1.5.md) §5. The authority is the `ExtensionEvent` union in `dist/core/extensions/types.d.ts`.
+> Two fictional events previously documented here, `session_switch` / `session_fork`, were removed: they do not exist in 1.5.0 and a subscription would never fire.
+
+## Lifecycle Overview
 
 ```
 pi starts
@@ -53,110 +56,108 @@ exit
   └─► session_shutdown
 ```
 
-## 会话事件
+## Session Events
 
 ### session_start
 
-会话加载时触发。
+Fires when a session is loaded.
 
 ```typescript
 pi.on("session_start", async (_event, ctx) => {
-  ctx.ui.notify("扩展已加载!", "info");
+  ctx.ui.notify("Extension loaded!", "info");
 });
 ```
 
-### session_before_switch / session_switch
+### session_before_switch
 
-切换会话时触发（`/new`, `/resume`）。
+Fires before switching sessions (`/new`, `/resume`). **1.5.0 has no `session_switch` event.**
 
 ```typescript
 pi.on("session_before_switch", async (event, ctx) => {
   // event.reason: "new" | "resume"
-  // event.targetSessionFile: 目标会话文件（仅 resume）
-  return { cancel: true }; // 取消切换
-});
-
-pi.on("session_switch", async (event, ctx) => {
-  // event.previousSessionFile: 之前的会话
+  // event.targetSessionFile: target session file (resume only)
+  return { cancel: true }; // cancel the switch
 });
 ```
 
-### session_before_fork / session_fork
+> `pi.on` returns an unsubscribe function `() => void`; long-lived handlers should call it on shutdown.
 
-分叉会话时触发（`/fork`）。
+### session_before_fork
+
+Fires before forking a session (`/fork`). **1.5.0 has no `session_fork` event.**
 
 ```typescript
 pi.on("session_before_fork", async (event, ctx) => {
-  // event.entryId: 分叉点的条目 ID
-  return { cancel: true }; // 取消
-  // 或 { skipConversationRestore: true } // 不恢复对话
+  // event.entryId: entry ID at the fork point
+  return { cancel: true }; // cancel
+  // or { skipConversationRestore: true } // do not restore the conversation
 });
 ```
 
 ### session_before_compact / session_compact
 
-压缩会话时触发。
+Fires when the session is compacted.
 
 ```typescript
 pi.on("session_before_compact", async (event, ctx) => {
   const { preparation, branchEntries, customInstructions, signal } = event;
-  return { cancel: true }; // 取消
-  // 或提供自定义摘要
+  return { cancel: true }; // cancel
+  // or supply a custom summary
   return { compaction: { summary: "...", firstKeptEntryId, tokensBefore } };
 });
 ```
 
 ### session_before_tree / session_tree
 
-树导航时触发（`/tree`）。
+Fires on tree navigation (`/tree`).
 
 ```typescript
 pi.on("session_before_tree", async (event, ctx) => {
-  return { cancel: true }; // 取消
-  // 或提供自定义摘要
+  return { cancel: true }; // cancel
+  // or supply a custom summary
   return { summary: { summary: "...", details: {} } };
 });
 ```
 
 ### session_shutdown
 
-退出时触发（Ctrl+C, Ctrl+D, SIGTERM）。
+Fires on exit (Ctrl+C, Ctrl+D, SIGTERM).
 
 ```typescript
 pi.on("session_shutdown", async (_event, ctx) => {
-  // 清理、保存状态
+  // clean up, save state
 });
 ```
 
-## Agent 事件
+## Agent Events
 
 ### before_agent_start
 
-用户提交提示后，Agent 循环开始前触发。
+Fires after the user submits a prompt and before the agent loop starts.
 
 ```typescript
 pi.on("before_agent_start", async (event, ctx) => {
   return {
     message: { customType: "my-ext", content: "...", display: true },
-    systemPrompt: event.systemPrompt + "\n额外指令...",
+    systemPrompt: event.systemPrompt + "\nExtra instructions...",
   };
 });
 ```
 
 ### agent_start / agent_end
 
-每个用户提示触发一次。
+Fires once per user prompt.
 
 ```typescript
 pi.on("agent_start", async (_event, ctx) => {});
 pi.on("agent_end", async (event, ctx) => {
-  // event.messages: 本次提示的消息
+  // event.messages: messages for this prompt
 });
 ```
 
 ### turn_start / turn_end
 
-每次 LLM 响应 + 工具调用时触发。
+Fires on each LLM response + tool call.
 
 ```typescript
 pi.on("turn_start", async (event, ctx) => {
@@ -169,7 +170,7 @@ pi.on("turn_end", async (event, ctx) => {
 
 ### context
 
-每次 LLM 调用前触发，可修改消息。
+Fires before each LLM call; messages can be modified.
 
 ```typescript
 pi.on("context", async (event, ctx) => {
@@ -178,17 +179,17 @@ pi.on("context", async (event, ctx) => {
 });
 ```
 
-## 工具事件
+## Tool Events
 
 ### tool_call
 
-工具执行前触发，**可拦截**。
+Fires before tool execution; **can be blocked**.
 
 ```typescript
 import { isToolCallEventType } from "@earendil-works/pi-coding-agent";
 
 pi.on("tool_call", async (event, ctx) => {
-  // 内置工具
+  // built-in tools
   if (isToolCallEventType("bash", event)) {
     // event.input: { command: string; timeout?: number }
   }
@@ -197,14 +198,14 @@ pi.on("tool_call", async (event, ctx) => {
     // event.input: { path: string; offset?: number; limit?: number }
   }
 
-  // 拦截
-  return { block: true, reason: "原因" };
+  // block
+  return { block: true, reason: "Reason" };
 });
 ```
 
 ### tool_result
 
-工具执行后触发，**可修改结果**。
+Fires after tool execution; **the result can be modified**.
 
 ```typescript
 import { isBashToolResult } from "@earendil-works/pi-coding-agent";
@@ -214,74 +215,74 @@ pi.on("tool_result", async (event, ctx) => {
     // event.details: BashToolDetails
   }
 
-  // 修改结果
+  // modify the result
   return { content: [...], details: {...}, isError: false };
 });
 ```
 
-## 输入事件
+## Input Events
 
 ### input
 
-用户输入时触发（技能/模板扩展前）。
+Fires on user input, before skill/template expansion.
 
 ```typescript
 pi.on("input", async (event, ctx) => {
-  // event.text: 原始输入
-  // event.images: 附加的图片
+  // event.text: raw input
+  // event.images: attached images
   // event.source: "interactive" | "rpc" | "extension"
 
-  // 转换
+  // transform
   if (event.text.startsWith("?quick ")) {
-    return { action: "transform", text: `简洁回答: ${event.text.slice(7)}` };
+    return { action: "transform", text: `Answer briefly: ${event.text.slice(7)}` };
   }
 
-  // 处理（跳过 Agent）
+  // handle (skip the agent)
   if (event.text === "ping") {
     ctx.ui.notify("pong", "info");
     return { action: "handled" };
   }
 
-  // 继续
+  // continue
   return { action: "continue" };
 });
 ```
 
-**结果类型：**
-- `continue` - 继续处理（默认）
-- `transform` - 修改后继续
-- `handled` - 跳过 Agent
+**Result types:**
+- `continue` — keep processing (default)
+- `transform` — continue with modified text
+- `handled` — skip the agent
 
-## 模型事件
+## Model Events
 
 ### model_select
 
-模型切换时触发。
+Fires when the model changes.
 
 ```typescript
 pi.on("model_select", async (event, ctx) => {
-  // event.model: 新模型
-  // event.previousModel: 之前的模型
+  // event.model: new model
+  // event.previousModel: previous model
   // event.source: "set" | "cycle" | "restore"
 });
 ```
 
-## 用户 Bash 事件
+## User Bash Events
 
 ### user_bash
 
-用户执行 `!` 或 `!!` 命令时触发。
+Fires when the user runs a `!` or `!!` command.
 
 ```typescript
 pi.on("user_bash", (event, ctx) => {
-  // event.command: 命令
-  // event.excludeFromContext: true 如果 !! 前缀
-  // event.cwd: 工作目录
+  // event.command: command
+  // event.excludeFromContext: true when the !! prefix is used
+  // event.cwd: working directory
 
-  // 提供自定义操作
+  // provide custom operations
   return { operations: remoteBashOps };
 
-  // 或直接返回结果
+  // or return a full result
   return { result: { output: "...", exitCode: 0, ... } };
 });
 ```
