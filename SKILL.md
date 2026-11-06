@@ -26,6 +26,8 @@ The `guides/` and `references/` directories contain deeper narratives and exampl
 - **Extension is slow to start?** → [`references/startup-optimization.md`](references/startup-optimization.md) — jiti bottleneck, .js vs .ts, discovery cost.
 - **Need TUI component?** → [`PATTERNS.md`](PATTERNS.md) §P12–§P14, then [`guides/02-paradigms.md`](guides/02-paradigms.md) for narrative.
 - **Need beautiful TUI rendering?** → [`references/tui-beautiful-rendering.md`](references/tui-beautiful-rendering.md) — box drawing, overlays, badges, SVG widgets.
+- **Need mouse wheel / click / hover in a TUI component?** → [`references/tui-mouse-interaction.md`](references/tui-mouse-interaction.md) — event contract, `rowMap`, press/click, coordinate translation.
+- **A themed overlay looks wrong, or clicks hit the wrong row?** → [`references/tui-mouse-interaction.md`](references/tui-mouse-interaction.md) §6–§9 (wrapper offsets, `Container` TS2416, hard-coded SGR, standalone module resolution).
 - **Need multi-agent patterns?** → [`references/extension-patterns-from-source.md`](references/extension-patterns-from-source.md) — agent coordination, tasks, feeds.
 - **Need custom provider/OAuth?** → [`PATTERNS.md`](PATTERNS.md) §P19–§P20, then [`guides/07-advanced-patterns.md`](guides/07-advanced-patterns.md).
 - **Need RPC safety?** → [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) §A2, then [`guides/05-rpc-mode.md`](guides/05-rpc-mode.md).
@@ -66,6 +68,9 @@ I need pi internals (loader, runner, binding)
 
 I need startup optimization, speed up extension loading
   └─► references/startup-optimization.md
+
+I need mouse wheel, click, hover, or coordinate-safe delegation
+  └─► references/tui-mouse-interaction.md
 
 I need provider plugins, OAuth, overrides
   └─► guides/07-advanced-patterns.md
@@ -128,6 +133,7 @@ State is temporary cache? ─────────────────►
 | [`references/ui-components.md`](references/ui-components.md) | TUI component catalog |
 | [`references/extension-patterns-from-source.md`](references/extension-patterns-from-source.md) | Multi-agent, diff rendering, config patterns from 10+ extensions |
 | [`references/tui-beautiful-rendering.md`](references/tui-beautiful-rendering.md) | Beautiful TUI: box drawing, transcript, overlays, badges, SVG/HTML widgets |
+| [`references/tui-mouse-interaction.md`](references/tui-mouse-interaction.md) | Mouse wheel/click/hover contracts, `rowMap` hit-testing, wrapper coordinate translation, theming & standalone module-resolution pitfalls |
 | [`references/startup-optimization.md`](references/startup-optimization.md) | Startup perf: jiti transpilation, .js vs .ts, measuring bottlenecks |
 
 ### Tutorials
@@ -187,6 +193,7 @@ import { StringEnum } from "@earendil-works/pi-ai";
 
 // TUI
 import { Container, Text, SelectList } from "@earendil-works/pi-tui";
+import type { TuiMouseEvent, TuiMouseEventResult } from "@earendil-works/pi-tui";
 
 // Utilities
 import { withFileMutationQueue } from "@earendil-works/pi-coding-agent";
@@ -208,6 +215,9 @@ Custom tools that mutate files must use `withFileMutationQueue()` to avoid race 
 
 ### RPC Safety
 `ctx.hasUI` is `true` in RPC, but `custom()` returns `undefined`. Use `select`/`confirm`/`input`/`editor` for blocking dialogs that work in both modes. See [`ANTI-PATTERNS.md`](ANTI-PATTERNS.md) §A2 and [`guides/05-rpc-mode.md`](guides/05-rpc-mode.md).
+
+### TUI Mouse & Theming
+`ctx.ui.custom` components receive mouse events only in fullscreen mode, `move` defaults to no repaint, and a result without `handled`/`capture`/`focus` is discarded. Wrappers must translate `event.y` before delegating, and standalone extensions often cannot top-level value-import `@earendil-works/pi-tui` without breaking their tests. Full contracts: [`references/tui-mouse-interaction.md`](references/tui-mouse-interaction.md).
 
 ---
 

@@ -226,6 +226,8 @@ if (matchesKey(data, Key.escape)) { /* ESC */ }
 if (matchesKey(data, Key.tab)) { /* Tab */ }
 ```
 
+> 鼠标滚轮 / 点击 / hover、行命中 `rowMap`、wrapper 坐标平移与主题化陷阱：见 [`tui-mouse-interaction.md`](tui-mouse-interaction.md)。
+
 ## 主题颜色
 
 ```typescript
